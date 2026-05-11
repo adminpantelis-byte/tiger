@@ -1,0 +1,15 @@
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.xcarchive
+*.moved-aside
+*.hmap
+*.ipa
+*.app
+*.dSYM
+*.xcresult
+Package.resolved
