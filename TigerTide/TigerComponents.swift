@@ -15,12 +15,12 @@ extension Color {
 extension TigerTileKind {
     var tint: Color {
         switch self {
-        case .ember: return .tigerHex(0xFF4B22)
-        case .lotus: return .tigerHex(0xFF77B8)
+        case .ember: return .tigerHex(0xFF5A36)
+        case .lotus: return .tigerHex(0xFF6FB1)
         case .shell: return .tigerHex(0xFFE18A)
         case .bamboo: return .tigerHex(0x39C96B)
-        case .moon: return .tigerHex(0x6BD8FF)
-        case .coin: return .tigerHex(0xFFD447)
+        case .moon: return .tigerHex(0x60D6F5)
+        case .coin: return .tigerHex(0xFFE15A)
         }
     }
 }
@@ -36,9 +36,9 @@ struct FestivalBackground: View {
                     Path(rect),
                     with: .linearGradient(
                         Gradient(colors: [
-                            .tigerHex(0xFF3A22),
-                            .tigerHex(0xB61022),
-                            .tigerHex(0x5B0733)
+                            .tigerHex(0xFF4438),
+                            .tigerHex(0xC7193B),
+                            .tigerHex(0x4B0A4F)
                         ]),
                         startPoint: .zero,
                         endPoint: CGPoint(x: size.width, y: size.height)
@@ -64,7 +64,7 @@ struct FestivalBackground: View {
                     let isCoin = index.isMultiple(of: 4)
                     let symbolRect = CGRect(x: baseX, y: y, width: isCoin ? 11 : 8, height: isCoin ? 11 : 8)
                     if isCoin {
-                        context.fill(Path(ellipseIn: symbolRect), with: .color(.tigerHex(0xFFD447).opacity(0.84)))
+                        context.fill(Path(ellipseIn: symbolRect), with: .color(.tigerHex(0xFFE15A).opacity(0.84)))
                         context.stroke(Path(ellipseIn: symbolRect), with: .color(.white.opacity(0.32)), lineWidth: 1)
                     } else {
                         context.fill(Path(ellipseIn: symbolRect), with: .color(.tigerHex(0xFFB2C9).opacity(0.74)))
@@ -77,8 +77,8 @@ struct FestivalBackground: View {
                 roof.addLine(to: CGPoint(x: size.width + 20, y: size.height * 0.34))
                 roof.addQuadCurve(to: CGPoint(x: -20, y: size.height * 0.34), control: CGPoint(x: size.width / 2, y: size.height * 0.25))
                 roof.closeSubpath()
-                context.fill(roof, with: .linearGradient(Gradient(colors: [.tigerHex(0x16A05C), .tigerHex(0x04713C)]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)))
-                context.stroke(roof, with: .color(.tigerHex(0xFFD447).opacity(0.8)), lineWidth: 3)
+                context.fill(roof, with: .linearGradient(Gradient(colors: [.tigerHex(0x12A86B), .tigerHex(0x066B47)]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)))
+                context.stroke(roof, with: .color(.tigerHex(0xFFE15A).opacity(0.8)), lineWidth: 3)
             }
             .ignoresSafeArea()
         }
@@ -106,11 +106,11 @@ struct TigerButtonStyle: ButtonStyle {
 
 struct TigerTitle: View {
     var body: some View {
-        Text("TIGER TIDE")
+        Text("TIGERS TIDE")
             .font(.system(size: 39, weight: .black, design: .rounded))
         .foregroundStyle(.white)
-        .shadow(color: Color.tigerHex(0xFFD447), radius: 8)
-        .shadow(color: Color.tigerHex(0xC21522), radius: 2)
+        .shadow(color: Color.tigerHex(0xFFE15A), radius: 8)
+        .shadow(color: Color.tigerHex(0xD9273D), radius: 2)
     }
 }
 
@@ -125,11 +125,11 @@ struct TigerAvatar: View {
             .overlay(
                 RoundedRectangle(cornerRadius: focused ? 28 : 22, style: .continuous)
                     .stroke(
-                        LinearGradient(colors: [.white.opacity(0.9), .tigerHex(0xFFD447).opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                        LinearGradient(colors: [.white.opacity(0.9), .tigerHex(0xFFE15A).opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing),
                         lineWidth: focused ? 3 : 1.5
                     )
             )
-            .shadow(color: Color.tigerHex(0xFFD447).opacity(focused ? 0.48 : 0.22), radius: focused ? 14 : 6, y: focused ? 5 : 2)
+            .shadow(color: Color.tigerHex(0xFFE15A).opacity(focused ? 0.48 : 0.22), radius: focused ? 14 : 6, y: focused ? 5 : 2)
     }
 }
 
@@ -173,7 +173,7 @@ struct ProgressStrip: View {
                 ZStack(alignment: .leading) {
                     Capsule().fill(.black.opacity(0.28))
                     Capsule()
-                        .fill(LinearGradient(colors: [tint, .tigerHex(0xFFD447)], startPoint: .leading, endPoint: .trailing))
+                        .fill(LinearGradient(colors: [tint, .tigerHex(0xFFE15A)], startPoint: .leading, endPoint: .trailing))
                         .frame(width: max(8, proxy.size.width * min(1, max(0, progress))))
                 }
             }
@@ -194,7 +194,7 @@ struct TideTileView: View {
                 .fill(entry.tile.flooded ? Color.tigerHex(0x5E1021).opacity(0.86) : entry.tile.kind.tint.opacity(0.31))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(highlighted ? Color.tigerHex(0xFFD447) : .white.opacity(selected ? 0.55 : 0.14), lineWidth: highlighted ? 3 : 1)
+                        .stroke(highlighted ? Color.tigerHex(0xFFE15A) : .white.opacity(selected ? 0.55 : 0.14), lineWidth: highlighted ? 3 : 1)
                 )
                 .shadow(color: entry.tile.kind.tint.opacity(highlighted ? 0.7 : 0.14), radius: highlighted ? 8 : 2)
 
@@ -228,7 +228,7 @@ struct TrailCard: View {
                 Spacer()
                 Text("+\(trail.reward)")
                     .font(.system(size: 10, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.tigerHex(0xFFD447))
+                    .foregroundStyle(Color.tigerHex(0xFFE15A))
             }
 
             HStack(spacing: 5) {
@@ -246,7 +246,7 @@ struct TrailCard: View {
         .padding(7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(Color.tigerHex(0xFFD447).opacity(0.25), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.25), lineWidth: 1))
     }
 }
 
@@ -263,7 +263,7 @@ struct CoinPill: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .background(.black.opacity(0.25), in: Capsule())
-        .overlay(Capsule().stroke(Color.tigerHex(0xFFD447).opacity(0.55), lineWidth: 1))
+        .overlay(Capsule().stroke(Color.tigerHex(0xFFE15A).opacity(0.55), lineWidth: 1))
     }
 }
 
@@ -275,7 +275,7 @@ struct StarRating: View {
             ForEach(0..<3, id: \.self) { index in
                 Image(systemName: index < count ? "star.fill" : "star")
                     .font(.system(size: 26, weight: .black))
-                    .foregroundStyle(index < count ? Color.tigerHex(0xFFD447) : .white.opacity(0.35))
+                    .foregroundStyle(index < count ? Color.tigerHex(0xFFE15A) : .white.opacity(0.35))
             }
         }
     }

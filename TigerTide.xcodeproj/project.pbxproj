@@ -74,6 +74,14 @@
 			path = TigerTide;
 			sourceTree = "<group>";
 		};
+		020000000000000000000034 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				020000000000000000000012 /* TigerTide.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		020000000000000000000035 /* TigerWebKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -87,14 +95,6 @@
 				020000000000000000000187 /* TigerWebFactory.swift */,
 			);
 			path = TigerWebKit;
-			sourceTree = "<group>";
-		};
-		020000000000000000000034 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				020000000000000000000012 /* TigerTide.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,7 +314,7 @@
 				DEVELOPMENT_TEAM = H9W6ZG9949;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Tiger Tide";
+				INFOPLIST_KEY_CFBundleDisplayName = "Tigers Tide";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -326,7 +326,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tigertide.game;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tigerstide.game;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -349,7 +349,7 @@
 				DEVELOPMENT_TEAM = H9W6ZG9949;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Tiger Tide";
+				INFOPLIST_KEY_CFBundleDisplayName = "Tigers Tide";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -361,7 +361,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tigertide.game;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tigerstide.game;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -396,7 +396,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = 020000000000000000000070 /* Project object */;
 }

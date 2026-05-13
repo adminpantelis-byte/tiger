@@ -268,7 +268,7 @@ struct OnboardingView: View {
             HStack(spacing: 8) {
                 ForEach(0..<pages.count, id: \.self) { index in
                     Capsule()
-                        .fill(index == page ? Color.tigerHex(0xFFD447) : .white.opacity(0.34))
+                        .fill(index == page ? Color.tigerHex(0xFFE15A) : .white.opacity(0.34))
                         .frame(width: index == page ? 32 : 10, height: 8)
                 }
             }
@@ -280,7 +280,7 @@ struct OnboardingView: View {
                     page += 1
                 }
             }
-            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x16A05C)))
+            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x12A86B)))
             .padding(.horizontal, 42)
             Spacer()
         }
@@ -309,7 +309,7 @@ struct TigerMenuView: View {
                 CoinPill(value: coins)
                 Spacer()
                 Button("GUIDE") { onGuide() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xB61022)))
+                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
                     .frame(width: 94)
             }
 
@@ -327,7 +327,7 @@ struct TigerMenuView: View {
                     subtitle: "Unlock level \(min(completedLevels + 1, TigerLevel.campaign.count)) of \(TigerLevel.campaign.count)",
                     icon: "map.fill",
                     value: "\(completedLevels) / \(TigerLevel.campaign.count)",
-                    tint: .tigerHex(0x16A05C),
+                    tint: .tigerHex(0x12A86B),
                     action: onJourney
                 )
 
@@ -336,7 +336,7 @@ struct TigerMenuView: View {
                     subtitle: "Short bright rounds with boosters.",
                     icon: "gamecontroller.fill",
                     value: "\(totalStars) stars",
-                    tint: .tigerHex(0xFF77B8),
+                    tint: .tigerHex(0xFF6FB1),
                     action: onPlay
                 )
             }
@@ -344,7 +344,7 @@ struct TigerMenuView: View {
             if let unlock = lastUnlocks.first {
                 Label("Unlocked: \(unlock.title)", systemImage: unlock.icon)
                     .font(.system(size: 13, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.tigerHex(0xFFD447))
+                    .foregroundStyle(Color.tigerHex(0xFFE15A))
                     .frame(maxWidth: .infinity)
                     .padding(10)
                     .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
@@ -352,12 +352,12 @@ struct TigerMenuView: View {
 
             HStack(spacing: 10) {
                 Button("SHOP") { onShop() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFFD447)))
+                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFFE15A)))
                 Button("ACHIEVEMENTS") { onAchievements() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x16A05C)))
+                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x12A86B)))
             }
             Button("REPLAY INTRO") { onHow() }
-                .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x6BD8FF)))
+                .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x60D6F5)))
             Spacer(minLength: 0)
             ProductTabBar(active: .home, onHome: {}, onJourney: onJourney, onPlay: onPlay, onArchive: onArchive, onSettings: onSettings)
         }
@@ -391,7 +391,7 @@ struct ProductHeroCard: View {
                     .foregroundStyle(.white)
                     .lineLimit(2)
                 Button("Open Journey") { onPlay() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFFD447)))
+                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFFE15A)))
                     .frame(width: 170)
             }
 
@@ -402,10 +402,10 @@ struct ProductHeroCard: View {
         }
         .padding(18)
         .background(
-            LinearGradient(colors: [.tigerHex(0xFF4B62), .tigerHex(0xF25A25)], startPoint: .topLeading, endPoint: .bottomTrailing),
+            LinearGradient(colors: [.tigerHex(0xFF526D), .tigerHex(0xF46B2D)], startPoint: .topLeading, endPoint: .bottomTrailing),
             in: RoundedRectangle(cornerRadius: 22, style: .continuous)
         )
-        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(Color.tigerHex(0xFFD447).opacity(0.5), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.5), lineWidth: 1))
     }
 }
 
@@ -439,7 +439,7 @@ struct ProductInfoCard: View {
 
                 Text(value)
                     .font(.system(size: 13, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.tigerHex(0xFFD447))
+                    .foregroundStyle(Color.tigerHex(0xFFE15A))
             }
             .padding(14)
             .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 17, style: .continuous))
@@ -480,7 +480,7 @@ struct ProductTabBar: View {
             }
             .foregroundStyle(active == tab ? .black : .white.opacity(0.76))
             .frame(maxWidth: .infinity, minHeight: 50)
-            .background(active == tab ? Color.tigerHex(0xFFD447) : .clear, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
+            .background(active == tab ? Color.tigerHex(0xFFE15A) : .clear, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
         }
         .buttonStyle(.plain)
     }
@@ -509,7 +509,7 @@ struct JourneyView: View {
                             HStack(spacing: 12) {
                                 Text("\(level.id)")
                                     .font(.system(size: 20, weight: .black, design: .rounded))
-                                    .foregroundStyle(locked ? .white.opacity(0.35) : Color.tigerHex(0xFFD447))
+                                    .foregroundStyle(locked ? .white.opacity(0.35) : Color.tigerHex(0xFFE15A))
                                     .frame(width: 42, height: 42)
                                     .background(.black.opacity(0.22), in: Circle())
 
@@ -558,10 +558,10 @@ struct ArchiveView: View {
         VStack(spacing: 14) {
             topBar(title: "ARCHIVE", onBack: onBack)
             VStack(spacing: 10) {
-                ProductInfoCard(title: "Wins", subtitle: "Completed levels", icon: "flag.checkered", value: "\(totalWins)", tint: .tigerHex(0x16A05C), action: {})
-                ProductInfoCard(title: "Stars", subtitle: "Best level results", icon: "star.fill", value: "\(totalStars)", tint: .tigerHex(0xFFD447), action: {})
-                ProductInfoCard(title: "Coins Earned", subtitle: "Run rewards collected", icon: "circle.hexagongrid.fill", value: "\(totalCoinsEarned)", tint: .tigerHex(0xFF77B8), action: {})
-                ProductInfoCard(title: "Achievements", subtitle: "Unlocked milestones", icon: "trophy.fill", value: "\(unlocked.count)/\(AchievementCatalog.all.count)", tint: .tigerHex(0x6BD8FF), action: {})
+                ProductInfoCard(title: "Wins", subtitle: "Completed levels", icon: "flag.checkered", value: "\(totalWins)", tint: .tigerHex(0x12A86B), action: {})
+                ProductInfoCard(title: "Stars", subtitle: "Best level results", icon: "star.fill", value: "\(totalStars)", tint: .tigerHex(0xFFE15A), action: {})
+                ProductInfoCard(title: "Coins Earned", subtitle: "Run rewards collected", icon: "circle.hexagongrid.fill", value: "\(totalCoinsEarned)", tint: .tigerHex(0xFF6FB1), action: {})
+                ProductInfoCard(title: "Achievements", subtitle: "Unlocked milestones", icon: "trophy.fill", value: "\(unlocked.count)/\(AchievementCatalog.all.count)", tint: .tigerHex(0x60D6F5), action: {})
             }
             Spacer()
             ProductTabBar(active: .archive, onHome: onHome, onJourney: onJourney, onPlay: onPlay, onArchive: {}, onSettings: onSettings)
@@ -582,13 +582,13 @@ struct SettingsView: View {
     var body: some View {
         VStack(spacing: 14) {
             topBar(title: "SETTINGS", onBack: onBack)
-            ProductInfoCard(title: "How To Play", subtitle: "Rules, trails, boosters, progression.", icon: "questionmark.circle.fill", value: "GUIDE", tint: .tigerHex(0x6BD8FF), action: onGuide)
-            ProductInfoCard(title: "Replay Intro", subtitle: "Show onboarding cards again.", icon: "play.rectangle.fill", value: "OPEN", tint: .tigerHex(0x16A05C), action: onReplayIntro)
+            ProductInfoCard(title: "How To Play", subtitle: "Rules, trails, boosters, progression.", icon: "questionmark.circle.fill", value: "GUIDE", tint: .tigerHex(0x60D6F5), action: onGuide)
+            ProductInfoCard(title: "Replay Intro", subtitle: "Show onboarding cards again.", icon: "play.rectangle.fill", value: "OPEN", tint: .tigerHex(0x12A86B), action: onReplayIntro)
             Toggle(isOn: $soundEnabled) {
                 HStack(spacing: 13) {
                     Image(systemName: soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
                         .font(.system(size: 24, weight: .black))
-                        .foregroundStyle(Color.tigerHex(0xFFD447))
+                        .foregroundStyle(Color.tigerHex(0xFFE15A))
                         .frame(width: 54, height: 54)
                         .background(.white.opacity(0.16), in: Circle())
 
@@ -602,7 +602,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            .toggleStyle(SwitchToggleStyle(tint: .tigerHex(0xFFD447)))
+            .toggleStyle(SwitchToggleStyle(tint: .tigerHex(0xFFE15A)))
             .padding(14)
             .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 17, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 17, style: .continuous).stroke(.white.opacity(0.12), lineWidth: 1))
@@ -616,13 +616,13 @@ struct SettingsView: View {
 private func topBar(title: String, onBack: @escaping () -> Void) -> some View {
     HStack(spacing: 12) {
         Button("BACK") { onBack() }
-            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xB61022)))
+            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
             .frame(width: 96)
         Spacer()
         Text(title)
             .font(.system(size: 26, weight: .black, design: .rounded))
             .foregroundStyle(.white)
-            .shadow(color: Color.tigerHex(0xFFD447), radius: 8)
+            .shadow(color: Color.tigerHex(0xFFE15A), radius: 8)
             .lineLimit(1)
             .minimumScaleFactor(0.72)
             .frame(maxWidth: .infinity)
@@ -642,11 +642,11 @@ struct TigerShopView: View {
     let onBack: () -> Void
 
     private let items: [ShopItem] = [
-        ShopItem(id: "roar", kind: .roar, title: "Tiger Roar", subtitle: "Adds one cross-clearing roar.", price: 35, icon: "bolt.fill", tint: .tigerHex(0xFF4B22)),
-        ShopItem(id: "beacon", kind: .beacon, title: "Moon Beacon", subtitle: "Pins one tile above water.", price: 25, icon: "moon.stars.fill", tint: .tigerHex(0x6BD8FF)),
-        ShopItem(id: "moves", kind: .moveCharm, title: "Move Charm", subtitle: "+3 moves on the next level.", price: 55, icon: "figure.run", tint: .tigerHex(0x16A05C)),
-        ShopItem(id: "focus", kind: .focusCharm, title: "Focus Charm", subtitle: "Start next level with +3 focus.", price: 50, icon: "sparkles", tint: .tigerHex(0xFF77B8)),
-        ShopItem(id: "gold", kind: .goldSkin, title: "Golden Tiger", subtitle: "Permanent luxury tiger style.", price: 160, icon: "crown.fill", tint: .tigerHex(0xFFD447)),
+        ShopItem(id: "roar", kind: .roar, title: "Tiger Roar", subtitle: "Adds one cross-clearing roar.", price: 35, icon: "bolt.fill", tint: .tigerHex(0xFF5A36)),
+        ShopItem(id: "beacon", kind: .beacon, title: "Moon Beacon", subtitle: "Pins one tile above water.", price: 25, icon: "moon.stars.fill", tint: .tigerHex(0x60D6F5)),
+        ShopItem(id: "moves", kind: .moveCharm, title: "Move Charm", subtitle: "+3 moves on the next level.", price: 55, icon: "figure.run", tint: .tigerHex(0x12A86B)),
+        ShopItem(id: "focus", kind: .focusCharm, title: "Focus Charm", subtitle: "Start next level with +3 focus.", price: 50, icon: "sparkles", tint: .tigerHex(0xFF6FB1)),
+        ShopItem(id: "gold", kind: .goldSkin, title: "Golden Tiger", subtitle: "Permanent luxury tiger style.", price: 160, icon: "crown.fill", tint: .tigerHex(0xFFE15A)),
         ShopItem(id: "blossom", kind: .blossomTheme, title: "Blossom Festival", subtitle: "Permanent pink petal celebration.", price: 140, icon: "camera.macro", tint: .tigerHex(0xFF9EC4))
     ]
 
@@ -714,7 +714,7 @@ struct AchievementsView: View {
                 HStack(spacing: 14) {
                     Image(systemName: achievement.icon)
                         .font(.system(size: 27, weight: .black))
-                        .foregroundStyle(unlocked.contains(achievement.id) ? Color.tigerHex(0xFFD447) : .white.opacity(0.38))
+                        .foregroundStyle(unlocked.contains(achievement.id) ? Color.tigerHex(0xFFE15A) : .white.opacity(0.38))
                         .frame(width: 62, height: 62)
                         .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
@@ -728,7 +728,7 @@ struct AchievementsView: View {
                     }
                     Spacer()
                     Image(systemName: unlocked.contains(achievement.id) ? "checkmark.seal.fill" : "lock.fill")
-                        .foregroundStyle(unlocked.contains(achievement.id) ? Color.tigerHex(0x16A05C) : .white.opacity(0.4))
+                        .foregroundStyle(unlocked.contains(achievement.id) ? Color.tigerHex(0x12A86B) : .white.opacity(0.4))
                 }
                 .padding(15)
                 .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -793,7 +793,7 @@ struct GuideSettingsView: View {
             }
 
             Button("REPLAY INTRO") { onReplayIntro() }
-                .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x6BD8FF)))
+                .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x60D6F5)))
         }
     }
 }
@@ -809,7 +809,7 @@ struct GuideCard: View {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 24, weight: .black))
-                    .foregroundStyle(Color.tigerHex(0xFFD447))
+                    .foregroundStyle(Color.tigerHex(0xFFE15A))
                     .frame(width: 48, height: 48)
                     .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
@@ -833,7 +833,7 @@ struct GuideCard: View {
         }
         .padding(16)
         .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.tigerHex(0xFFD447).opacity(0.24), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.24), lineWidth: 1))
     }
 }
 
@@ -854,7 +854,7 @@ struct StoreScreen<Content: View>: View {
         VStack(spacing: 16) {
             HStack {
                 Button("BACK") { onBack() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xB61022)))
+                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
                     .frame(width: 104)
                 Spacer()
                 CoinPill(value: coins)
@@ -862,7 +862,7 @@ struct StoreScreen<Content: View>: View {
             Text(title)
                 .font(.system(size: 30, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
-                .shadow(color: Color.tigerHex(0xFFD447), radius: 8)
+                .shadow(color: Color.tigerHex(0xFFE15A), radius: 8)
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 13) {
                     content
@@ -897,7 +897,7 @@ struct ShopRow: View {
                     .foregroundStyle(.white.opacity(0.72))
                 Text(ownedText)
                     .font(.system(size: 13, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.tigerHex(0xFFD447))
+                    .foregroundStyle(Color.tigerHex(0xFFE15A))
             }
             Spacer()
             Button(purchased ? "OWNED" : "\(item.price)") { action() }

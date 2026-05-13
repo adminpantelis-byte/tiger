@@ -1,6 +1,6 @@
 workflows:
   ios-testflight:
-    name: Tiger Tide iOS TestFlight
+    name: Tigers Tide iOS TestFlight
     max_build_duration: 120
     instance_type: mac_mini_m2
 
@@ -10,12 +10,12 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.tigertide.game
+        bundle_identifier: com.tigerstide.game
       vars:
         XCODE_PROJECT: "TigerTide.xcodeproj"
         XCODE_SCHEME: "TigerTide"
-        BUNDLE_ID: "com.tigertide.game"
-        APP_STORE_APPLE_ID: "6768377434"
+        BUNDLE_ID: "com.tigerstide.game"
+        APP_STORE_APPLE_ID: "6769200038"
       xcode: latest
       cocoapods: default
 

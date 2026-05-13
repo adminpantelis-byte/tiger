@@ -1,6 +1,6 @@
-# Tiger Tide
+# Tigers Tide
 
-`Tiger Tide` is a standalone SwiftUI iOS game with a bright tiger festival direction: red and gold UI, coin rain, cherry petals, temple roof silhouettes, and a celebratory tiger mascot.
+`Tigers Tide` is a standalone SwiftUI iOS game with a bright tiger festival direction: red and gold UI, coin rain, cherry petals, temple roof silhouettes, and a celebratory tiger mascot.
 
 ## Level System
 
