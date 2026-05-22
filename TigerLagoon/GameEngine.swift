@@ -12,10 +12,10 @@ enum TigerTileKind: String, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .ember: return "flame.fill"
+        case .ember: return "sparkles"
         case .lotus: return "camera.macro"
         case .shell: return "seal.fill"
-        case .bamboo: return "tree.fill"
+        case .bamboo: return "leaf.fill"
         case .moon: return "moon.stars.fill"
         case .coin: return "circle.hexagongrid.fill"
         }
@@ -104,6 +104,8 @@ struct TigerLevelResult {
     let trailsOpened: Int
     let coins: Int
     let stars: Int
+    let movesLeft: Int
+    let maxCombo: Int
 }
 
 struct TigerOutcome {
@@ -122,7 +124,7 @@ enum TigerMoveError: Error {
     case levelOver
 }
 
-struct TigerTideGame {
+struct TigerLagoonGame {
     let width = 6
     let height = 6
 
@@ -135,6 +137,8 @@ struct TigerTideGame {
     private(set) var beaconCharges = 2
     private(set) var trailsOpened = 0
     private(set) var coinsEarned = 0
+    private(set) var combo = 0
+    private(set) var maxCombo = 0
     private(set) var tiger = TidePoint(x: 2, y: 3)
     private(set) var trails: [TideTrail] = []
     private(set) var isComplete = false
@@ -154,6 +158,8 @@ struct TigerTideGame {
         beaconCharges = level.startingBeacons
         trailsOpened = 0
         coinsEarned = 0
+        combo = 0
+        maxCombo = 0
         isComplete = false
         tiger = TidePoint(x: 2, y: 3)
         cells = []
@@ -204,22 +210,31 @@ struct TigerTideGame {
         let kind = cells[index(point)].kind
         cells[index(point)].marked = true
 
-        let base = 18 + focus * 3 + (kind == .coin ? 10 : 0)
+        let base = 14 + focus * 2 + (kind == .coin ? 5 : 0)
         score += base
         focus = min(12, focus + 1)
         tide = (tide + 1) % 4
 
         let trailReward = feedTrails(with: kind)
-        score += trailReward.score
-        coinsEarned += trailReward.coins
+        if trailReward.progressed {
+            combo = min(9, combo + 1)
+            maxCombo = max(maxCombo, combo)
+        } else {
+            combo = 0
+        }
+
+        let comboBonus = trailReward.progressed ? combo * 6 : 0
+        let coinBonus = kind == .coin && combo >= 2 ? 1 : 0
+        score += trailReward.score + comboBonus
+        coinsEarned += trailReward.coins + coinBonus
 
         redrawTide()
         let completed = completionIfReady()
 
         return TigerOutcome(
-            scoreDelta: base + trailReward.score,
-            coinDelta: trailReward.coins,
-            message: completed == nil ? (trailReward.message ?? "\(kind.rawValue.uppercased()) STRIPE CLAIMED") : "LEVEL COMPLETE",
+            scoreDelta: base + trailReward.score + comboBonus,
+            coinDelta: trailReward.coins + coinBonus,
+            message: completed == nil ? (trailReward.message ?? "\(kind.rawValue.uppercased()) TIDE MARK") : "LEVEL COMPLETE",
             highlights: [point],
             completedLevel: completed
         )
@@ -246,6 +261,7 @@ struct TigerTideGame {
         let delta = cleared.count * 12
         score += delta
         focus = min(12, focus + 2)
+        combo = 0
         tide = (tide + 2) % 4
         redrawTide()
 
@@ -278,21 +294,21 @@ struct TigerTideGame {
         moves += max(0, amount)
     }
 
-    private mutating func feedTrails(with kind: TigerTileKind) -> (score: Int, coins: Int, message: String?) {
+    private mutating func feedTrails(with kind: TigerTileKind) -> (score: Int, coins: Int, progressed: Bool, message: String?) {
         for index in trails.indices {
             guard trails[index].currentNeed == kind else { continue }
             trails[index].progress += 1
             guard trails[index].progress == trails[index].needs.count else {
-                return (0, 0, "\(trails[index].name.uppercased()) ADVANCES")
+                return (0, 0, true, "\(trails[index].name.uppercased()) ADVANCES")
             }
 
             let reward = trails[index].reward
             let name = trails[index].name.uppercased()
             trailsOpened += 1
             trails[index] = makeTrail()
-            return (reward, max(1, reward / 34), "\(name) OPENED")
+            return (reward, max(1, reward / 58), true, "\(name) OPENED")
         }
-        return (0, 0, nil)
+        return (0, 0, false, nil)
     }
 
     private mutating func completionIfReady() -> TigerLevelResult? {
@@ -300,8 +316,8 @@ struct TigerTideGame {
         guard score >= level.targetScore, trailsOpened >= level.targetTrails else { return nil }
 
         isComplete = true
-        let efficiencyBonus = max(0, moves / 4)
-        let completionReward = max(8, level.reward / 4)
+        let efficiencyBonus = max(0, moves / 7)
+        let completionReward = max(6, level.reward / 7)
         let totalCoins = completionReward + coinsEarned + efficiencyBonus
         coinsEarned += completionReward + efficiencyBonus
 
@@ -314,7 +330,7 @@ struct TigerTideGame {
             stars = 1
         }
 
-        return TigerLevelResult(level: level, score: score, trailsOpened: trailsOpened, coins: totalCoins, stars: stars)
+        return TigerLevelResult(level: level, score: score, trailsOpened: trailsOpened, coins: totalCoins, stars: stars, movesLeft: moves, maxCombo: maxCombo)
     }
 
     private mutating func redrawTide() {

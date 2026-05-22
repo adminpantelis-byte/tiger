@@ -3,7 +3,7 @@ import Foundation
 
 let canvasSize = CGSize(width: 1290, height: 2796)
 let outputDir = URL(fileURLWithPath: "Marketing/AppStoreScreenshots", isDirectory: true)
-let logo = NSImage(contentsOfFile: "TigerTide/Assets.xcassets/TigerLogo.imageset/tiger-logo.png")
+let logo = NSImage(contentsOfFile: "TigerLagoon/Assets.xcassets/LagoonLogo.imageset/lagoon-logo.png")
 
 func color(_ hex: Int, _ alpha: CGFloat = 1) -> NSColor {
     NSColor(
@@ -153,7 +153,7 @@ func drawHome(_ screen: CGRect) {
 func drawGame(_ screen: CGRect) {
     drawScreenBackground(screen)
     pill("HOME", rect(screen.minX + 42, screen.maxY - 176, 210, 92), fill: color(0x890b2d, 0.55))
-    drawText("TIGERS TIDE", in: rect(screen.minX + 280, screen.maxY - 160, 390, 64), size: 42, weight: .black, align: .center)
+    drawText("TIGER LAGOON", in: rect(screen.minX + 248, screen.maxY - 160, 454, 64), size: 42, weight: .black, align: .center)
     let status = rect(screen.minX + 44, screen.maxY - 550, screen.width - 88, 320)
     card(status, fill: color(0x5b0828, 0.56), stroke: color(0xffe15a, 0.4))
     drawLogo(rect(status.minX + 28, status.maxY - 116, 90, 90))
@@ -247,7 +247,7 @@ extension NSShadow {
 }
 
 let screens: [(String, String, String, (CGRect) -> Void)] = [
-    ("01-home.png", "Tigers Tide", "bright puzzle runs for iPhone", drawHome),
+    ("01-home.png", "Tiger Lagoon", "bright puzzle runs for iPhone", drawHome),
     ("02-gameplay.png", "Leap. Match. Open Trails.", "tap tiles, collect runes, beat the tide", drawGame),
     ("03-win.png", "Earn 1-3 Stars", "complete goals and unlock the next level", drawWin),
     ("04-journey.png", "24 Level Journey", "progress through festival puzzle chapters", drawJourney),

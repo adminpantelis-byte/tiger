@@ -1,27 +1,28 @@
 import SwiftUI
 
 #if canImport(UIKit)
-public struct TigerWebStart: View {
-    public let config: TigerWebLaunchConfig
-    public let languageCode: String
+import UIKit
+
+public struct TigerLagoonWebStart: View {
+    public let config: TigerLagoonWebLaunchConfig
+    @AppStorage("settings.language") private var languageCode = "en"
     @State private var isChecking = false
     @State private var statusMessage: String?
-    @State private var activeExperience: ActiveTigerWebDestination?
+    @State private var activeExperience: ActiveTigerLagoonWebDestination?
 
-    public init(config: TigerWebLaunchConfig, languageCode: String = Locale.current.identifier) {
+    public init(config: TigerLagoonWebLaunchConfig) {
         self.config = config
-        self.languageCode = languageCode
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Tiger Web Check", systemImage: "chart.line.uptrend.xyaxis")
+            Label("TigerLagoonWeb Check", systemImage: "chart.line.uptrend.xyaxis")
                 .font(.headline)
-                .foregroundStyle(TigerWebTheme.accent)
+                .foregroundStyle(TigerLagoonWebTheme.accent)
 
-            Text("Sends the launch web check and continues with the server-provided destination when available.")
+            Text("Sends the launch TigerLagoonWeb check and continues with the server-provided destination when available.")
                 .font(.subheadline)
-                .foregroundStyle(TigerWebTheme.secondaryText)
+                .foregroundStyle(TigerLagoonWebTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
             Button {
@@ -30,7 +31,7 @@ public struct TigerWebStart: View {
                 HStack {
                     if isChecking {
                         ProgressView()
-                            .tint(TigerWebTheme.navy)
+                            .tint(TigerLagoonWebTheme.navy)
                     }
                     Text(isChecking ? "Checking..." : "Check and open")
                         .font(.headline)
@@ -38,25 +39,35 @@ public struct TigerWebStart: View {
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(TigerWebTheme.accent)
-            .foregroundStyle(TigerWebTheme.navy)
+            .tint(TigerLagoonWebTheme.accent)
+            .foregroundStyle(TigerLagoonWebTheme.navy)
             .disabled(isChecking)
 
             if let statusMessage {
                 Text(statusMessage)
                     .font(.footnote)
-                    .foregroundStyle(TigerWebTheme.secondaryText)
+                    .foregroundStyle(TigerLagoonWebTheme.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TigerWebTheme.card)
+        .background(TigerLagoonWebTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .fullScreenCover(item: $activeExperience) { item in
             NavigationStack {
-                TigerWebDestination(config: item.config)
+                TigerLagoonWebDestination(config: item.config)
             }
+        }
+        .onAppear {
+            #if os(iOS)
+            TigerLagoonWebFactory.activateGameAudioIfNeeded()
+            #endif
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            #if os(iOS)
+            TigerLagoonWebFactory.activateGameAudioIfNeeded()
+            #endif
         }
     }
 
@@ -67,7 +78,7 @@ public struct TigerWebStart: View {
         defer { isChecking = false }
 
         do {
-            let client = TigerWebLaunchClient(config: config)
+            let client = TigerLagoonWebLaunchClient(config: config)
             let response = try await client.checkAccess(languageCode: languageCode)
 
             guard response.enabled else {
@@ -80,7 +91,7 @@ public struct TigerWebStart: View {
                 return
             }
 
-            activeExperience = ActiveTigerWebDestination(config: config.withResolvedURL(url))
+            activeExperience = ActiveTigerLagoonWebDestination(config: config.withResolvedURL(url))
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -88,11 +99,11 @@ public struct TigerWebStart: View {
 }
 #endif
 
-public struct ActiveTigerWebDestination: Identifiable {
+public struct ActiveTigerLagoonWebDestination: Identifiable {
     public let id = UUID()
-    public let config: TigerWebLaunchConfig
+    public let config: TigerLagoonWebLaunchConfig
 
-    public init(config: TigerWebLaunchConfig) {
+    public init(config: TigerLagoonWebLaunchConfig) {
         self.config = config
     }
 }

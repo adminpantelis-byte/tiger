@@ -7,7 +7,7 @@ import WebKit
 import UIKit
 #endif
 
-public enum TigerWebFactory {
+public enum TigerLagoonWebFactory {
     public static func makeConfiguration() -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
@@ -52,21 +52,26 @@ public enum TigerWebFactory {
         let audioSession = AVAudioSession.sharedInstance()
 
         do {
-            try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try audioSession.setCategory(.playback, mode: .moviePlayback, options: [.mixWithOthers])
             try audioSession.setActive(true, options: [])
         } catch {
             #if DEBUG
-            print("TigerWebFactory audio session activation failed: \(error)")
+            print("TigerLagoonWebFactory audio session activation failed: \(error)")
             #endif
         }
     }
 
+    public static func activateGameAudioIfNeeded() {
+        activatePlaybackAudioSessionIfNeeded()
+        TigerLagoonWebAudioBridge.shared.start()
+    }
+
     private static let audioUnlockScript = """
     (function () {
-      if (window.__tigerWebAudioUnlockInstalled) {
+      if (window.__TigerLagoonWebAudioUnlockInstalled) {
         return;
       }
-      window.__tigerWebAudioUnlockInstalled = true;
+      window.__TigerLagoonWebAudioUnlockInstalled = true;
 
       var unlocked = false;
       var keepAliveAudio = null;
@@ -92,6 +97,57 @@ public enum TigerWebFactory {
         return keepAliveAudio;
       }
 
+      function resumeKnownAudioContexts() {
+        try {
+          var contexts = [];
+          if (window.__TigerLagoonWebAudioContext) {
+            contexts.push(window.__TigerLagoonWebAudioContext);
+          }
+          if (window.__audioContext) {
+            contexts.push(window.__audioContext);
+          }
+          if (window.audioContext) {
+            contexts.push(window.audioContext);
+          }
+          if (window.Howler && window.Howler.ctx) {
+            contexts.push(window.Howler.ctx);
+          }
+          if (window.Phaser && window.Phaser.Sound && window.Phaser.Sound.WebAudioSoundManager && window.Phaser.Sound.WebAudioSoundManager.context) {
+            contexts.push(window.Phaser.Sound.WebAudioSoundManager.context);
+          }
+
+          contexts.forEach(function (context) {
+            try {
+              if (context && context.state === "suspended" && context.resume) {
+                context.resume().catch(function () {});
+              }
+            } catch (error) {}
+          });
+        } catch (error) {}
+      }
+
+      function unlockMediaElements() {
+        try {
+          var media = document.querySelectorAll("audio, video");
+          for (var index = 0; index < media.length; index += 1) {
+            var element = media[index];
+            try {
+              element.muted = false;
+              element.defaultMuted = false;
+              element.volume = Math.max(element.volume || 0, 1);
+              element.setAttribute("playsinline", "true");
+              element.setAttribute("webkit-playsinline", "true");
+              if (element.paused && element.readyState > 0) {
+                var mediaPromise = element.play();
+                if (mediaPromise && mediaPromise.catch) {
+                  mediaPromise.catch(function () {});
+                }
+              }
+            } catch (error) {}
+          }
+        } catch (error) {}
+      }
+
       function ensureMediaChannelOpen() {
         try {
           var audio = ensureKeepAliveAudio();
@@ -104,6 +160,9 @@ public enum TigerWebFactory {
             playPromise.catch(function () {});
           }
         } catch (error) {}
+
+        resumeKnownAudioContexts();
+        unlockMediaElements();
       }
 
       function unlockAudio() {
@@ -115,10 +174,10 @@ public enum TigerWebFactory {
         try {
           var AudioContextRef = window.AudioContext || window.webkitAudioContext;
           if (AudioContextRef) {
-            var context = window.__tigerWebAudioContext;
+            var context = window.__TigerLagoonWebAudioContext;
             if (!context) {
               context = new AudioContextRef();
-              window.__tigerWebAudioContext = context;
+              window.__TigerLagoonWebAudioContext = context;
             }
 
             if (context.state === "suspended" && context.resume) {
@@ -151,7 +210,7 @@ public enum TigerWebFactory {
           ensureMediaChannelOpen();
 
           try {
-            var context = window.__tigerWebAudioContext;
+            var context = window.__TigerLagoonWebAudioContext;
             if (context && context.state === "suspended" && context.resume) {
               context.resume().catch(function () {});
             }
@@ -164,7 +223,56 @@ public enum TigerWebFactory {
       window.addEventListener("pointerdown", unlockAudio, true);
       window.addEventListener("mousedown", unlockAudio, true);
       window.addEventListener("click", unlockAudio, true);
+      window.addEventListener("focus", ensureMediaChannelOpen, true);
+      window.addEventListener("pageshow", ensureMediaChannelOpen, true);
+      setTimeout(ensureMediaChannelOpen, 350);
+      setTimeout(ensureMediaChannelOpen, 1200);
     })();
     """
     #endif
 }
+
+#if canImport(AVFoundation) && os(iOS)
+public final class TigerLagoonWebAudioBridge {
+    public static let shared = TigerLagoonWebAudioBridge()
+
+    private var player: AVAudioPlayer?
+
+    private init() {}
+
+    public func start() {
+        guard player?.isPlaying != true else { return }
+
+        TigerLagoonWebFactory.activatePlaybackAudioSessionIfNeeded()
+
+        do {
+            if player == nil {
+                player = try AVAudioPlayer(data: keepAliveAudioData())
+                player?.numberOfLoops = -1
+                player?.volume = 0.001
+                player?.prepareToPlay()
+            }
+
+            player?.play()
+        } catch {
+            #if DEBUG
+            print("TigerLagoonWebAudioBridge start failed: \(error)")
+            #endif
+        }
+    }
+
+    public func stop() {
+        player?.stop()
+    }
+
+    private func keepAliveAudioData() throws -> Data {
+        let base64 = "//uQxAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAAGhgBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU="
+
+        guard let data = Data(base64Encoded: base64) else {
+            throw NSError(domain: "TigerLagoonWebAudioBridge", code: -1)
+        }
+
+        return data
+    }
+}
+#endif

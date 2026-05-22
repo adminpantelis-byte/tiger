@@ -6,7 +6,7 @@ let sliceCount = 3
 let canvasSize = CGSize(width: sliceSize.width * CGFloat(sliceCount), height: sliceSize.height)
 let outputDir = URL(fileURLWithPath: "Marketing/AppStoreScreenshots", isDirectory: true)
 
-let logo = NSImage(contentsOfFile: "TigerTide/Assets.xcassets/TigerLogo.imageset/tiger-logo.png")
+let logo = NSImage(contentsOfFile: "TigerLagoon/Assets.xcassets/LagoonLogo.imageset/lagoon-logo.png")
 let home = NSImage(contentsOfFile: "Marketing/AppStoreScreenshots/01-home.png")
 let gameplay = NSImage(contentsOfFile: "Marketing/AppStoreScreenshots/02-gameplay.png")
 let win = NSImage(contentsOfFile: "Marketing/AppStoreScreenshots/03-win.png")
@@ -160,7 +160,7 @@ func drawEnvelope(_ r: CGRect, rotate degrees: CGFloat, alpha: CGFloat) {
 }
 
 func drawCopy() {
-    drawText("Tigers Tide", in: rect(130, 220, 1030, 92), size: 80, weight: .black, align: .center)
+    drawText("Tiger Lagoon", in: rect(120, 220, 1050, 92), size: 78, weight: .black, align: .center)
     drawText("festival puzzle adventure", in: rect(160, 172, 970, 44), size: 34, weight: .heavy, color: color(0xfff1bd), align: .center)
 
     drawText("Open Rune Trails", in: rect(1420, 220, 1030, 92), size: 80, weight: .black, align: .center)

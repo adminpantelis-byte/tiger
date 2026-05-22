@@ -4,11 +4,11 @@ import UIKit
 import UniformTypeIdentifiers
 import WebKit
 
-public struct TigerWebContent: UIViewRepresentable {
-    public let config: TigerWebLaunchConfig
-    @ObservedObject public var model: TigerWebNavigationModel
+public struct TigerLagoonWebContent: UIViewRepresentable {
+    public let config: TigerLagoonWebLaunchConfig
+    @ObservedObject public var model: TigerLagoonWebNavigationModel
 
-    public init(config: TigerWebLaunchConfig, model: TigerWebNavigationModel) {
+    public init(config: TigerLagoonWebLaunchConfig, model: TigerLagoonWebNavigationModel) {
         self.config = config
         self.model = model
     }
@@ -18,7 +18,7 @@ public struct TigerWebContent: UIViewRepresentable {
     }
 
     public func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView(frame: .zero, configuration: TigerWebFactory.makeConfiguration())
+        let webView = WKWebView(frame: .zero, configuration: TigerLagoonWebFactory.makeConfiguration())
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
@@ -26,7 +26,7 @@ public struct TigerWebContent: UIViewRepresentable {
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         #if os(iOS)
         webView.configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-        TigerWebFactory.activatePlaybackAudioSessionIfNeeded()
+        TigerLagoonWebFactory.activateGameAudioIfNeeded()
         #endif
         model.webView = webView
 
@@ -47,10 +47,10 @@ public struct TigerWebContent: UIViewRepresentable {
     }
 
     public final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, UIDocumentPickerDelegate {
-        fileprivate let model: TigerWebNavigationModel
+        fileprivate let model: TigerLagoonWebNavigationModel
         private var fileSelectionHandler: (([URL]?) -> Void)?
 
-        init(model: TigerWebNavigationModel) {
+        init(model: TigerLagoonWebNavigationModel) {
             self.model = model
         }
 
@@ -67,7 +67,31 @@ public struct TigerWebContent: UIViewRepresentable {
                 model.isLoading = false
                 model.refreshNavigationState()
                 #if os(iOS)
-                TigerWebFactory.activatePlaybackAudioSessionIfNeeded()
+                TigerLagoonWebFactory.activateGameAudioIfNeeded()
+                _ = try? await webView.evaluateJavaScript("window.dispatchEvent(new Event('pageshow')); window.dispatchEvent(new Event('focus'));")
+                #endif
+            }
+        }
+
+        public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+            Task { @MainActor in
+                model.errorMessage = nil
+                model.refreshNavigationState()
+                #if os(iOS)
+                TigerLagoonWebFactory.activateGameAudioIfNeeded()
+                _ = try? await webView.evaluateJavaScript("window.dispatchEvent(new Event('focus'));")
+                #endif
+            }
+        }
+
+        public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            Task { @MainActor in
+                model.isLoading = false
+                model.errorMessage = "The page was interrupted and has been refreshed. If something still looks wrong, try again."
+                model.refreshNavigationState()
+                webView.reload()
+                #if os(iOS)
+                TigerLagoonWebFactory.activateGameAudioIfNeeded()
                 #endif
             }
         }
@@ -138,7 +162,7 @@ public struct TigerWebContent: UIViewRepresentable {
             picker.allowsMultipleSelection = parameters.allowsMultipleSelection
             picker.modalPresentationStyle = .formSheet
 
-            guard let presenter = webView.tigerWebTopViewController() else {
+            guard let presenter = webView.TigerLagoonWebTopViewController() else {
                 fileSelectionHandler = nil
                 completionHandler(nil)
                 return
@@ -167,7 +191,7 @@ public struct TigerWebContent: UIViewRepresentable {
             }
 
             let directoryURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("tiger-web-file-uploads", isDirectory: true)
+                .appendingPathComponent("TigerLagoonWeb-file-uploads", isDirectory: true)
 
             do {
                 try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
@@ -216,7 +240,7 @@ public struct TigerWebContent: UIViewRepresentable {
 }
 
 private extension WKWebView {
-    func tigerWebTopViewController() -> UIViewController? {
+    func TigerLagoonWebTopViewController() -> UIViewController? {
         var topController = window?.rootViewController
 
         while let presentedController = topController?.presentedViewController {
@@ -228,7 +252,7 @@ private extension WKWebView {
 }
 
 @MainActor
-public final class TigerWebNavigationModel: ObservableObject {
+public final class TigerLagoonWebNavigationModel: ObservableObject {
     @Published public var isLoading = false
     @Published public var canGoBack = false
     @Published public var canGoForward = false
@@ -250,6 +274,10 @@ public final class TigerWebNavigationModel: ObservableObject {
     }
 
     public func reload() {
+        errorMessage = nil
+        #if os(iOS)
+        TigerLagoonWebFactory.activateGameAudioIfNeeded()
+        #endif
         webView?.reload()
     }
 

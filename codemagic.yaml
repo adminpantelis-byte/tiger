@@ -1,6 +1,6 @@
 workflows:
   ios-testflight:
-    name: Tigers Tide iOS TestFlight
+    name: Tiger Lagoon iOS TestFlight
     max_build_duration: 120
     instance_type: mac_mini_m2
 
@@ -10,12 +10,12 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.tigerstide.game
+        bundle_identifier: com.tigerlagoon.quest
       vars:
-        XCODE_PROJECT: "TigerTide.xcodeproj"
-        XCODE_SCHEME: "TigerTide"
-        BUNDLE_ID: "com.tigerstide.game"
-        APP_STORE_APPLE_ID: "6769200038"
+        XCODE_PROJECT: "TigerLagoon.xcodeproj"
+        XCODE_SCHEME: "TigerLagoon"
+        BUNDLE_ID: "com.tigerlagoon.quest"
+        APP_STORE_APPLE_ID: "6772159205"
       xcode: latest
       cocoapods: default
 

@@ -1,31 +1,33 @@
 import SwiftUI
 
 #if canImport(UIKit)
-public struct TigerWebDestination: View {
-    public let config: TigerWebLaunchConfig
-    @StateObject private var model = TigerWebNavigationModel()
+import UIKit
 
-    public init(config: TigerWebLaunchConfig) {
+public struct TigerLagoonWebDestination: View {
+    public let config: TigerLagoonWebLaunchConfig
+    @StateObject private var model = TigerLagoonWebNavigationModel()
+
+    public init(config: TigerLagoonWebLaunchConfig) {
         self.config = config
     }
 
     public var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .top) {
-                TigerWebTheme.overlay
+                TigerLagoonWebTheme.overlay
                     .ignoresSafeArea()
 
-                TigerWebContent(config: config, model: model)
+                TigerLagoonWebContent(config: config, model: model)
                     .padding(.top, webContentTopInset(topInset: proxy.safeAreaInsets.top))
                     .ignoresSafeArea(edges: [.horizontal, .bottom])
 
-                tigerWebControls(topInset: proxy.safeAreaInsets.top, width: proxy.size.width)
+                TigerLagoonWebControls(topInset: proxy.safeAreaInsets.top, width: proxy.size.width)
 
                 if model.isLoading {
                     ProgressView()
-                        .tint(TigerWebTheme.accent)
+                        .tint(TigerLagoonWebTheme.accent)
                         .padding(10)
-                        .background(TigerWebTheme.overlay.opacity(0.85))
+                        .background(TigerLagoonWebTheme.overlay.opacity(0.85))
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                         .padding(.top, webContentTopInset(topInset: proxy.safeAreaInsets.top) + 16)
                 }
@@ -41,12 +43,12 @@ public struct TigerWebDestination: View {
                             model.reload()
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(TigerWebTheme.accent)
-                        .foregroundStyle(TigerWebTheme.navy)
+                        .tint(TigerLagoonWebTheme.accent)
+                        .foregroundStyle(TigerLagoonWebTheme.navy)
                     }
                     .padding(16)
                     .foregroundStyle(.white)
-                    .background(TigerWebTheme.overlay.opacity(0.92))
+                    .background(TigerLagoonWebTheme.overlay.opacity(0.92))
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     .padding(20)
                     .padding(.top, webContentTopInset(topInset: proxy.safeAreaInsets.top))
@@ -55,7 +57,14 @@ public struct TigerWebDestination: View {
             .ignoresSafeArea()
         }
         .onAppear {
-            TigerWebFactory.prewarm(url: config.initialURL, timeout: config.requestTimeout)
+            TigerLagoonWebFactory.activateGameAudioIfNeeded()
+            TigerLagoonWebFactory.prewarm(url: config.initialURL, timeout: config.requestTimeout)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            TigerLagoonWebFactory.activateGameAudioIfNeeded()
+        }
+        .onDisappear {
+            TigerLagoonWebAudioBridge.shared.stop()
         }
     }
 
@@ -67,21 +76,21 @@ public struct TigerWebDestination: View {
         width >= 430 ? 168 : 148
     }
 
-    private func tigerWebControls(topInset: CGFloat, width: CGFloat) -> some View {
+    private func TigerLagoonWebControls(topInset: CGFloat, width: CGFloat) -> some View {
         HStack {
             HStack(spacing: 8) {
-                tigerWebControlButton(systemName: "chevron.left", isEnabled: model.canGoBack) {
+                TigerLagoonWebControlButton(systemName: "chevron.left", isEnabled: model.canGoBack) {
                     model.goBack()
                 }
 
-                tigerWebControlButton(systemName: "chevron.right", isEnabled: model.canGoForward) {
+                TigerLagoonWebControlButton(systemName: "chevron.right", isEnabled: model.canGoForward) {
                     model.goForward()
                 }
             }
 
             Spacer(minLength: dynamicIslandClearance(width: width))
 
-            tigerWebControlButton(systemName: "arrow.clockwise", isEnabled: true) {
+            TigerLagoonWebControlButton(systemName: "arrow.clockwise", isEnabled: true) {
                 model.reload()
             }
         }
@@ -89,7 +98,7 @@ public struct TigerWebDestination: View {
         .padding(.top, max(topInset - 4, 8))
     }
 
-    private func tigerWebControlButton(
+    private func TigerLagoonWebControlButton(
         systemName: String,
         isEnabled: Bool,
         action: @escaping () -> Void

@@ -39,21 +39,23 @@ struct ShopItem: Identifiable {
 }
 
 struct TigerRootView: View {
-    @AppStorage("tigerTideSeenOnboarding") private var seenOnboarding = false
-    @AppStorage("tigerTideCoins") private var coins = 80
-    @AppStorage("tigerTideCurrentLevel") private var currentLevel = 1
-    @AppStorage("tigerTideCompletedLevels") private var completedLevels = 0
-    @AppStorage("tigerTideBestStars") private var bestStars = ""
-    @AppStorage("tigerTideRoars") private var roars = 1
-    @AppStorage("tigerTideBeacons") private var beacons = 1
-    @AppStorage("tigerTideMoveCharms") private var moveCharms = 0
-    @AppStorage("tigerTideFocusCharms") private var focusCharms = 0
-    @AppStorage("tigerTideGoldSkin") private var goldSkin = false
-    @AppStorage("tigerTideBlossomTheme") private var blossomTheme = false
-    @AppStorage("tigerTideAchievements") private var unlockedAchievements = ""
-    @AppStorage("tigerTideTotalWins") private var totalWins = 0
-    @AppStorage("tigerTideTotalStars") private var totalStars = 0
-    @AppStorage("tigerTideTotalCoinsEarned") private var totalCoinsEarned = 0
+    @AppStorage("tigerLagoonSeenOnboarding") private var seenOnboarding = false
+    @AppStorage("tigerLagoonCoins") private var coins = 80
+    @AppStorage("tigerLagoonCurrentLevel") private var currentLevel = 1
+    @AppStorage("tigerLagoonCompletedLevels") private var completedLevels = 0
+    @AppStorage("tigerLagoonBestStars") private var bestStars = ""
+    @AppStorage("tigerLagoonRoars") private var roars = 1
+    @AppStorage("tigerLagoonBeacons") private var beacons = 1
+    @AppStorage("tigerLagoonMoveCharms") private var moveCharms = 0
+    @AppStorage("tigerLagoonFocusCharms") private var focusCharms = 0
+    @AppStorage("tigerLagoonGoldSkin") private var goldSkin = false
+    @AppStorage("tigerLagoonBlossomTheme") private var blossomTheme = false
+    @AppStorage("tigerLagoonAchievements") private var unlockedAchievements = ""
+    @AppStorage("tigerLagoonTotalWins") private var totalWins = 0
+    @AppStorage("tigerLagoonTotalStars") private var totalStars = 0
+    @AppStorage("tigerLagoonTotalCoinsEarned") private var totalCoinsEarned = 0
+    @AppStorage("tigerLagoonTotalTrailsOpened") private var totalTrailsOpened = 0
+    @AppStorage("tigerLagoonBestCombo") private var bestCombo = 0
 
     @State private var screen: TigerScreen = .menu
     @State private var lastUnlocks: [Achievement] = []
@@ -78,6 +80,7 @@ struct TigerRootView: View {
                     currentLevel: currentLevel,
                     completedLevels: completedLevels,
                     totalStars: totalStars,
+                    bestCombo: bestCombo,
                     lastUnlocks: lastUnlocks,
                     onPlay: { screen = .game },
                     onShop: { screen = .shop },
@@ -103,7 +106,7 @@ struct TigerRootView: View {
                     onSettings: { screen = .settings }
                 )
             case .game:
-                TigerTideGameView(
+                TigerLagoonGameView(
                     level: level,
                     bonusMoves: moveCharms > 0 ? 3 : 0,
                     bonusFocus: focusCharms > 0 ? 3 : 0,
@@ -133,6 +136,8 @@ struct TigerRootView: View {
                     totalWins: totalWins,
                     totalStars: totalStars,
                     totalCoinsEarned: totalCoinsEarned,
+                    totalTrailsOpened: totalTrailsOpened,
+                    bestCombo: bestCombo,
                     onBack: { screen = .menu },
                     onHome: { screen = .menu },
                     onJourney: { screen = .journey },
@@ -167,6 +172,8 @@ struct TigerRootView: View {
         totalWins += 1
         totalStars += result.stars
         totalCoinsEarned += result.coins
+        totalTrailsOpened += result.trailsOpened
+        bestCombo = max(bestCombo, result.maxCombo)
         completedLevels = max(completedLevels, result.level.id)
 
         if moveCharms > 0 { moveCharms -= 1 }
@@ -180,8 +187,14 @@ struct TigerRootView: View {
     }
 
     private func goNextLevel() {
-        currentLevel = min(TigerLevel.campaign.count, level.id + 1)
-        screen = currentLevel == level.id ? .menu : .game
+        let completedLevel = level.id
+        guard completedLevel < TigerLevel.campaign.count else {
+            screen = .menu
+            return
+        }
+
+        currentLevel = completedLevel + 1
+        screen = .game
     }
 
     private var starMap: [Int: Int] {
@@ -205,10 +218,16 @@ struct TigerRootView: View {
             case "three_stars": shouldUnlock = result.stars == 3
             case "five_wins": shouldUnlock = totalWins >= 5
             case "coin_rain": shouldUnlock = totalCoinsEarned >= 500
-            case "half_campaign": shouldUnlock = completedLevels >= 4
+            case "half_campaign": shouldUnlock = completedLevels >= 12
             case "full_campaign": shouldUnlock = completedLevels >= TigerLevel.campaign.count
             case "big_score": shouldUnlock = result.score >= 1000
             case "collector": shouldUnlock = goldSkin && blossomTheme
+            case "trail_weaver": shouldUnlock = totalTrailsOpened >= 25
+            case "combo_surge": shouldUnlock = result.maxCombo >= 5
+            case "spare_steps": shouldUnlock = result.movesLeft >= 8
+            case "star_stack": shouldUnlock = totalStars >= 30
+            case "chapter_two": shouldUnlock = completedLevels >= 8
+            case "quiet_master": shouldUnlock = result.stars == 3 && result.movesLeft >= 10
             default: shouldUnlock = false
             }
 
@@ -230,10 +249,16 @@ enum AchievementCatalog {
         Achievement(id: "three_stars", title: "Golden Leap", detail: "Earn three stars on a level.", icon: "star.fill"),
         Achievement(id: "five_wins", title: "Festival Regular", detail: "Complete five levels.", icon: "sparkles"),
         Achievement(id: "coin_rain", title: "Coin Rain", detail: "Earn 500 coins from runs.", icon: "circle.hexagongrid.fill"),
-        Achievement(id: "half_campaign", title: "Temple Halfway", detail: "Complete level 4.", icon: "building.columns.fill"),
+        Achievement(id: "half_campaign", title: "Temple Halfway", detail: "Complete level 12.", icon: "building.columns.fill"),
         Achievement(id: "full_campaign", title: "Tiger Master", detail: "Complete the campaign.", icon: "crown.fill"),
         Achievement(id: "big_score", title: "High Score Energy", detail: "Score at least 1000 in one level.", icon: "bolt.fill"),
-        Achievement(id: "collector", title: "Festival Collector", detail: "Own both cosmetic shop items.", icon: "gift.fill")
+        Achievement(id: "collector", title: "Festival Collector", detail: "Own both cosmetic shop items.", icon: "gift.fill"),
+        Achievement(id: "trail_weaver", title: "Trail Weaver", detail: "Open 25 total trail cards.", icon: "point.topleft.down.curvedto.point.bottomright.up"),
+        Achievement(id: "combo_surge", title: "Combo Surge", detail: "Reach a x5 trail combo.", icon: "bolt.ring.closed"),
+        Achievement(id: "spare_steps", title: "Spare Steps", detail: "Win with at least 8 moves left.", icon: "shoeprints.fill"),
+        Achievement(id: "star_stack", title: "Star Stack", detail: "Collect 30 total stars.", icon: "star.leadinghalf.filled"),
+        Achievement(id: "chapter_two", title: "Market Path", detail: "Complete level 8.", icon: "storefront.fill"),
+        Achievement(id: "quiet_master", title: "Clean Tide", detail: "Earn 3 stars with 10 moves left.", icon: "checkmark.seal.fill")
     ]
 }
 
@@ -268,7 +293,7 @@ struct OnboardingView: View {
             HStack(spacing: 8) {
                 ForEach(0..<pages.count, id: \.self) { index in
                     Capsule()
-                        .fill(index == page ? Color.tigerHex(0xFFE15A) : .white.opacity(0.34))
+                        .fill(index == page ? TidePalette.mango : .white.opacity(0.34))
                         .frame(width: index == page ? 32 : 10, height: 8)
                 }
             }
@@ -280,7 +305,7 @@ struct OnboardingView: View {
                     page += 1
                 }
             }
-            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x12A86B)))
+            .buttonStyle(TigerButtonStyle(tint: TidePalette.mint))
             .padding(.horizontal, 42)
             Spacer()
         }
@@ -293,6 +318,7 @@ struct TigerMenuView: View {
     let currentLevel: Int
     let completedLevels: Int
     let totalStars: Int
+    let bestCombo: Int
     let lastUnlocks: [Achievement]
     let onPlay: () -> Void
     let onShop: () -> Void
@@ -309,7 +335,7 @@ struct TigerMenuView: View {
                 CoinPill(value: coins)
                 Spacer()
                 Button("GUIDE") { onGuide() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.orchid))
                     .frame(width: 94)
             }
 
@@ -327,16 +353,16 @@ struct TigerMenuView: View {
                     subtitle: "Unlock level \(min(completedLevels + 1, TigerLevel.campaign.count)) of \(TigerLevel.campaign.count)",
                     icon: "map.fill",
                     value: "\(completedLevels) / \(TigerLevel.campaign.count)",
-                    tint: .tigerHex(0x12A86B),
+                    tint: TidePalette.mint,
                     action: onJourney
                 )
 
                 ProductInfoCard(
                     title: "Festival Play",
-                    subtitle: "Short bright rounds with boosters.",
+                    subtitle: "Short bright rounds with combo trails.",
                     icon: "gamecontroller.fill",
-                    value: "\(totalStars) stars",
-                    tint: .tigerHex(0xFF6FB1),
+                    value: "x\(max(1, bestCombo)) best",
+                    tint: TidePalette.orchid,
                     action: onPlay
                 )
             }
@@ -344,7 +370,7 @@ struct TigerMenuView: View {
             if let unlock = lastUnlocks.first {
                 Label("Unlocked: \(unlock.title)", systemImage: unlock.icon)
                     .font(.system(size: 13, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.tigerHex(0xFFE15A))
+                    .foregroundStyle(TidePalette.mango)
                     .frame(maxWidth: .infinity)
                     .padding(10)
                     .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
@@ -352,12 +378,12 @@ struct TigerMenuView: View {
 
             HStack(spacing: 10) {
                 Button("SHOP") { onShop() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFFE15A)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.mango))
                 Button("ACHIEVEMENTS") { onAchievements() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x12A86B)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.mint))
             }
             Button("REPLAY INTRO") { onHow() }
-                .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x60D6F5)))
+                .buttonStyle(TigerButtonStyle(tint: TidePalette.sky))
             Spacer(minLength: 0)
             ProductTabBar(active: .home, onHome: {}, onJourney: onJourney, onPlay: onPlay, onArchive: onArchive, onSettings: onSettings)
         }
@@ -391,7 +417,7 @@ struct ProductHeroCard: View {
                     .foregroundStyle(.white)
                     .lineLimit(2)
                 Button("Open Journey") { onPlay() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFFE15A)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.mango))
                     .frame(width: 170)
             }
 
@@ -402,10 +428,10 @@ struct ProductHeroCard: View {
         }
         .padding(18)
         .background(
-            LinearGradient(colors: [.tigerHex(0xFF526D), .tigerHex(0xF46B2D)], startPoint: .topLeading, endPoint: .bottomTrailing),
+            LinearGradient(colors: [TidePalette.coral, TidePalette.lagoon], startPoint: .topLeading, endPoint: .bottomTrailing),
             in: RoundedRectangle(cornerRadius: 22, style: .continuous)
         )
-        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.5), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(TidePalette.mango.opacity(0.5), lineWidth: 1))
     }
 }
 
@@ -439,7 +465,7 @@ struct ProductInfoCard: View {
 
                 Text(value)
                     .font(.system(size: 13, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.tigerHex(0xFFE15A))
+                    .foregroundStyle(TidePalette.mango)
             }
             .padding(14)
             .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 17, style: .continuous))
@@ -478,9 +504,9 @@ struct ProductTabBar: View {
                 Text(title)
                     .font(.system(size: 10, weight: .black, design: .rounded))
             }
-            .foregroundStyle(active == tab ? .black : .white.opacity(0.76))
+            .foregroundStyle(active == tab ? TidePalette.ink : .white.opacity(0.76))
             .frame(maxWidth: .infinity, minHeight: 50)
-            .background(active == tab ? Color.tigerHex(0xFFE15A) : .clear, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
+            .background(active == tab ? TidePalette.mango : .clear, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
         }
         .buttonStyle(.plain)
     }
@@ -509,7 +535,7 @@ struct JourneyView: View {
                             HStack(spacing: 12) {
                                 Text("\(level.id)")
                                     .font(.system(size: 20, weight: .black, design: .rounded))
-                                    .foregroundStyle(locked ? .white.opacity(0.35) : Color.tigerHex(0xFFE15A))
+                                    .foregroundStyle(locked ? .white.opacity(0.35) : TidePalette.mango)
                                     .frame(width: 42, height: 42)
                                     .background(.black.opacity(0.22), in: Circle())
 
@@ -548,6 +574,8 @@ struct ArchiveView: View {
     let totalWins: Int
     let totalStars: Int
     let totalCoinsEarned: Int
+    let totalTrailsOpened: Int
+    let bestCombo: Int
     let onBack: () -> Void
     let onHome: () -> Void
     let onJourney: () -> Void
@@ -558,10 +586,12 @@ struct ArchiveView: View {
         VStack(spacing: 14) {
             topBar(title: "ARCHIVE", onBack: onBack)
             VStack(spacing: 10) {
-                ProductInfoCard(title: "Wins", subtitle: "Completed levels", icon: "flag.checkered", value: "\(totalWins)", tint: .tigerHex(0x12A86B), action: {})
-                ProductInfoCard(title: "Stars", subtitle: "Best level results", icon: "star.fill", value: "\(totalStars)", tint: .tigerHex(0xFFE15A), action: {})
-                ProductInfoCard(title: "Coins Earned", subtitle: "Run rewards collected", icon: "circle.hexagongrid.fill", value: "\(totalCoinsEarned)", tint: .tigerHex(0xFF6FB1), action: {})
-                ProductInfoCard(title: "Achievements", subtitle: "Unlocked milestones", icon: "trophy.fill", value: "\(unlocked.count)/\(AchievementCatalog.all.count)", tint: .tigerHex(0x60D6F5), action: {})
+                ProductInfoCard(title: "Wins", subtitle: "Completed levels", icon: "flag.checkered", value: "\(totalWins)", tint: TidePalette.mint, action: {})
+                ProductInfoCard(title: "Stars", subtitle: "Best level results", icon: "star.fill", value: "\(totalStars)", tint: TidePalette.mango, action: {})
+                ProductInfoCard(title: "Trails Opened", subtitle: "Festival routes completed", icon: "point.topleft.down.curvedto.point.bottomright.up", value: "\(totalTrailsOpened)", tint: TidePalette.mint, action: {})
+                ProductInfoCard(title: "Best Combo", subtitle: "Consecutive trail runes", icon: "bolt.ring.closed", value: "x\(max(1, bestCombo))", tint: TidePalette.coral, action: {})
+                ProductInfoCard(title: "Coins Earned", subtitle: "Run rewards collected", icon: "circle.hexagongrid.fill", value: "\(totalCoinsEarned)", tint: TidePalette.orchid, action: {})
+                ProductInfoCard(title: "Achievements", subtitle: "Unlocked milestones", icon: "trophy.fill", value: "\(unlocked.count)/\(AchievementCatalog.all.count)", tint: TidePalette.sky, action: {})
             }
             Spacer()
             ProductTabBar(active: .archive, onHome: onHome, onJourney: onJourney, onPlay: onPlay, onArchive: {}, onSettings: onSettings)
@@ -577,18 +607,18 @@ struct SettingsView: View {
     let onJourney: () -> Void
     let onPlay: () -> Void
     let onArchive: () -> Void
-    @AppStorage("tigerTideSoundEnabled") private var soundEnabled = true
+    @AppStorage("tigerLagoonSoundEnabled") private var soundEnabled = true
 
     var body: some View {
         VStack(spacing: 14) {
             topBar(title: "SETTINGS", onBack: onBack)
-            ProductInfoCard(title: "How To Play", subtitle: "Rules, trails, boosters, progression.", icon: "questionmark.circle.fill", value: "GUIDE", tint: .tigerHex(0x60D6F5), action: onGuide)
-            ProductInfoCard(title: "Replay Intro", subtitle: "Show onboarding cards again.", icon: "play.rectangle.fill", value: "OPEN", tint: .tigerHex(0x12A86B), action: onReplayIntro)
+            ProductInfoCard(title: "How To Play", subtitle: "Rules, trails, boosters, progression.", icon: "questionmark.circle.fill", value: "GUIDE", tint: TidePalette.sky, action: onGuide)
+            ProductInfoCard(title: "Replay Intro", subtitle: "Show onboarding cards again.", icon: "play.rectangle.fill", value: "OPEN", tint: TidePalette.mint, action: onReplayIntro)
             Toggle(isOn: $soundEnabled) {
                 HStack(spacing: 13) {
                     Image(systemName: soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
                         .font(.system(size: 24, weight: .black))
-                        .foregroundStyle(Color.tigerHex(0xFFE15A))
+                        .foregroundStyle(TidePalette.mango)
                         .frame(width: 54, height: 54)
                         .background(.white.opacity(0.16), in: Circle())
 
@@ -602,7 +632,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            .toggleStyle(SwitchToggleStyle(tint: .tigerHex(0xFFE15A)))
+            .toggleStyle(SwitchToggleStyle(tint: TidePalette.mango))
             .padding(14)
             .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 17, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 17, style: .continuous).stroke(.white.opacity(0.12), lineWidth: 1))
@@ -616,13 +646,13 @@ struct SettingsView: View {
 private func topBar(title: String, onBack: @escaping () -> Void) -> some View {
     HStack(spacing: 12) {
         Button("BACK") { onBack() }
-            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
+            .buttonStyle(TigerButtonStyle(tint: TidePalette.orchid))
             .frame(width: 96)
         Spacer()
         Text(title)
             .font(.system(size: 26, weight: .black, design: .rounded))
             .foregroundStyle(.white)
-            .shadow(color: Color.tigerHex(0xFFE15A), radius: 8)
+            .shadow(color: TidePalette.mango, radius: 8)
             .lineLimit(1)
             .minimumScaleFactor(0.72)
             .frame(maxWidth: .infinity)
@@ -642,12 +672,12 @@ struct TigerShopView: View {
     let onBack: () -> Void
 
     private let items: [ShopItem] = [
-        ShopItem(id: "roar", kind: .roar, title: "Tiger Roar", subtitle: "Adds one cross-clearing roar.", price: 35, icon: "bolt.fill", tint: .tigerHex(0xFF5A36)),
-        ShopItem(id: "beacon", kind: .beacon, title: "Moon Beacon", subtitle: "Pins one tile above water.", price: 25, icon: "moon.stars.fill", tint: .tigerHex(0x60D6F5)),
-        ShopItem(id: "moves", kind: .moveCharm, title: "Move Charm", subtitle: "+3 moves on the next level.", price: 55, icon: "figure.run", tint: .tigerHex(0x12A86B)),
-        ShopItem(id: "focus", kind: .focusCharm, title: "Focus Charm", subtitle: "Start next level with +3 focus.", price: 50, icon: "sparkles", tint: .tigerHex(0xFF6FB1)),
-        ShopItem(id: "gold", kind: .goldSkin, title: "Golden Tiger", subtitle: "Permanent luxury tiger style.", price: 160, icon: "crown.fill", tint: .tigerHex(0xFFE15A)),
-        ShopItem(id: "blossom", kind: .blossomTheme, title: "Blossom Festival", subtitle: "Permanent pink petal celebration.", price: 140, icon: "camera.macro", tint: .tigerHex(0xFF9EC4))
+        ShopItem(id: "roar", kind: .roar, title: "Tiger Roar", subtitle: "Adds one cross-clearing roar.", price: 45, icon: "waveform.path.ecg", tint: TidePalette.coral),
+        ShopItem(id: "beacon", kind: .beacon, title: "Moon Beacon", subtitle: "Pins one tile above water.", price: 32, icon: "moon.stars.fill", tint: TidePalette.sky),
+        ShopItem(id: "moves", kind: .moveCharm, title: "Move Charm", subtitle: "+3 moves on the next level.", price: 70, icon: "shoeprints.fill", tint: TidePalette.mint),
+        ShopItem(id: "focus", kind: .focusCharm, title: "Focus Charm", subtitle: "Start next level with +3 focus.", price: 64, icon: "sparkles", tint: TidePalette.orchid),
+        ShopItem(id: "gold", kind: .goldSkin, title: "Golden Tiger", subtitle: "Permanent luxury tiger style.", price: 210, icon: "crown.fill", tint: TidePalette.mango),
+        ShopItem(id: "blossom", kind: .blossomTheme, title: "Blossom Festival", subtitle: "Permanent pink petal celebration.", price: 180, icon: "camera.macro", tint: Color.tigerHex(0xFF8AC8))
     ]
 
     var body: some View {
@@ -714,7 +744,7 @@ struct AchievementsView: View {
                 HStack(spacing: 14) {
                     Image(systemName: achievement.icon)
                         .font(.system(size: 27, weight: .black))
-                        .foregroundStyle(unlocked.contains(achievement.id) ? Color.tigerHex(0xFFE15A) : .white.opacity(0.38))
+                        .foregroundStyle(unlocked.contains(achievement.id) ? TidePalette.mango : .white.opacity(0.38))
                         .frame(width: 62, height: 62)
                         .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
@@ -728,7 +758,7 @@ struct AchievementsView: View {
                     }
                     Spacer()
                     Image(systemName: unlocked.contains(achievement.id) ? "checkmark.seal.fill" : "lock.fill")
-                        .foregroundStyle(unlocked.contains(achievement.id) ? Color.tigerHex(0x12A86B) : .white.opacity(0.4))
+                        .foregroundStyle(unlocked.contains(achievement.id) ? TidePalette.mint : .white.opacity(0.4))
                 }
                 .padding(15)
                 .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -760,7 +790,7 @@ struct GuideSettingsView: View {
             [
                 "Flooded tiles are blocked until the tide pattern changes.",
                 "Every leap advances the tide and marks the tile with a paw.",
-                "Coin runes add small coin rewards while trail runes advance cards."
+                "Correct trail runes build a combo; missed trail runes reset it."
             ]
         ),
         (
@@ -780,8 +810,8 @@ struct GuideSettingsView: View {
             "Stars, coins, shop items, and achievements persist locally.",
             [
                 "Higher score and spare moves improve the star result.",
-                "Coins buy boosters, charms, and cosmetic festival items.",
-                "Achievements reward milestone play with bonus coins."
+                "Coins are earned from level wins, opened trails, and strong combos.",
+                "Achievements reward milestones, clean wins, combos, and campaign progress."
             ]
         )
     ]
@@ -793,7 +823,7 @@ struct GuideSettingsView: View {
             }
 
             Button("REPLAY INTRO") { onReplayIntro() }
-                .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x60D6F5)))
+                .buttonStyle(TigerButtonStyle(tint: TidePalette.sky))
         }
     }
 }
@@ -809,7 +839,7 @@ struct GuideCard: View {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 24, weight: .black))
-                    .foregroundStyle(Color.tigerHex(0xFFE15A))
+                    .foregroundStyle(TidePalette.mango)
                     .frame(width: 48, height: 48)
                     .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
@@ -833,7 +863,7 @@ struct GuideCard: View {
         }
         .padding(16)
         .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.24), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(TidePalette.mango.opacity(0.24), lineWidth: 1))
     }
 }
 
@@ -854,7 +884,7 @@ struct StoreScreen<Content: View>: View {
         VStack(spacing: 16) {
             HStack {
                 Button("BACK") { onBack() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.orchid))
                     .frame(width: 104)
                 Spacer()
                 CoinPill(value: coins)
@@ -862,7 +892,7 @@ struct StoreScreen<Content: View>: View {
             Text(title)
                 .font(.system(size: 30, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
-                .shadow(color: Color.tigerHex(0xFFE15A), radius: 8)
+                .shadow(color: TidePalette.mango, radius: 8)
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 13) {
                     content
@@ -897,7 +927,7 @@ struct ShopRow: View {
                     .foregroundStyle(.white.opacity(0.72))
                 Text(ownedText)
                     .font(.system(size: 13, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.tigerHex(0xFFE15A))
+                    .foregroundStyle(TidePalette.mango)
             }
             Spacer()
             Button(purchased ? "OWNED" : "\(item.price)") { action() }

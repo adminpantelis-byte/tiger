@@ -1,6 +1,6 @@
-# Tigers Tide
+# Tiger Lagoon
 
-`Tigers Tide` is a standalone SwiftUI iOS game with a bright tiger festival direction: red and gold UI, coin rain, cherry petals, temple roof silhouettes, and a celebratory tiger mascot.
+`Tiger Lagoon` is a standalone SwiftUI iOS game with a bright tiger lagoon direction: neon tide UI, coin sparks, festival particles, temple roof silhouettes, and a celebratory tiger mascot.
 
 ## Level System
 
@@ -25,13 +25,13 @@
 
 ## Achievements
 
-- The achievements screen lists 8 unlockable goals.
-- Achievements cover first win, three-star level, multiple wins, coin milestones, campaign progress, high score, and cosmetic collection.
+- The achievements screen lists 14 unlockable goals.
+- Achievements cover first win, three-star level, combo runs, clean wins, trail totals, coin milestones, campaign progress, high score, and cosmetic collection.
 - Newly unlocked achievements award bonus coins and are surfaced on the main menu.
 
 ## Shop
 
-- The Tiger Shop includes consumable boosters, next-run charms, and permanent cosmetics.
+- The Lagoon Shop includes consumable boosters, next-run charms, and permanent cosmetics.
 - Items: `Tiger Roar`, `Moon Beacon`, `Move Charm`, `Focus Charm`, `Golden Tiger`, and `Blossom Festival`.
 - Consumables track owned counts; permanent cosmetics show owned state.
 - Purchases are local and coin-based only.
@@ -53,21 +53,21 @@
 
 ## Visual Direction
 
-- Inspired by the provided screenshots: festive tiger, red/gold gradients, temple roof, glowing coins, petals, bold win typography, and compact mobile game panels.
+- Inspired by the provided screenshots: festive tiger, lagoon gradients, temple roof, glowing coins, confetti, bold win typography, and compact mobile game panels.
 - No real-money, betting, or slot mechanics are implemented.
 - The visual language is celebratory arcade progression, not gambling.
 
 ## Main Files
 
-- `TigerTide.xcodeproj`: open this in Xcode.
-- `TigerTide/TigerTideApp.swift`: app entry point.
-- `TigerTide/AppFlow.swift`: onboarding, main menu, shop, achievements, storage, and campaign progression.
-- `TigerTide/GameEngine.swift`: level definitions, board state, tide pattern, leap rules, scoring, trails, completion results.
-- `TigerTide/TigerTideGameView.swift`: main game screen, objective HUD, controls, and victory overlay.
-- `TigerTide/TigerComponents.swift`: festival background, tiger avatar, tiles, progress bars, buttons, stars, haptics.
+- `TigerLagoon.xcodeproj`: open this in Xcode.
+- `TigerLagoon/TigerLagoonApp.swift`: app entry point.
+- `TigerLagoon/AppFlow.swift`: onboarding, main menu, shop, achievements, storage, and campaign progression.
+- `TigerLagoon/GameEngine.swift`: level definitions, board state, tide pattern, leap rules, scoring, trails, completion results.
+- `TigerLagoon/TigerLagoonGameView.swift`: main game screen, objective HUD, controls, and victory overlay.
+- `TigerLagoon/TigerLagoonComponents.swift`: festival background, tiger avatar, tiles, progress bars, buttons, stars, haptics.
 
 ## Build
 
 ```sh
-xcodebuild -project TigerTide.xcodeproj -scheme TigerTide -destination 'generic/platform=iOS Simulator' build
+xcodebuild -project TigerLagoon.xcodeproj -scheme TigerLagoon -destination 'generic/platform=iOS Simulator' build
 ```

@@ -1,10 +1,10 @@
 import Foundation
 
-public struct TigerWebLaunchClient: Sendable {
-    public let config: TigerWebLaunchConfig
+public struct TigerLagoonWebLaunchClient: Sendable {
+    public let config: TigerLagoonWebLaunchConfig
     public var session: URLSession
 
-    public init(config: TigerWebLaunchConfig, session: URLSession? = nil) {
+    public init(config: TigerLagoonWebLaunchConfig, session: URLSession? = nil) {
         self.config = config
         if let session {
             self.session = session
@@ -16,7 +16,7 @@ public struct TigerWebLaunchClient: Sendable {
         }
     }
 
-    public func makeLaunchRequest(payload: TigerWebLaunchPayload) throws -> URLRequest {
+    public func makeLaunchRequest(payload: TigerLagoonWebLaunchPayload) throws -> URLRequest {
         var request = URLRequest(url: config.webCheckURL)
         request.httpMethod = "POST"
         request.timeoutInterval = config.requestTimeout
@@ -49,16 +49,16 @@ public struct TigerWebLaunchClient: Sendable {
         return request
     }
 
-    public func sendLaunchWeb(payload: TigerWebLaunchPayload) async throws -> TigerWebAvailabilityResponse {
+    public func sendLaunchWeb(payload: TigerLagoonWebLaunchPayload) async throws -> TigerLagoonWebAvailabilityResponse {
         let request = try makeLaunchRequest(payload: payload)
         return try await send(request: request)
     }
 
-    public func checkAccess() async throws -> TigerWebAvailabilityResponse {
+    public func checkAccess() async throws -> TigerLagoonWebAvailabilityResponse {
         try await checkAccess(languageCode: Self.currentLanguageCode())
     }
 
-    public func checkAccess(languageCode: String) async throws -> TigerWebAvailabilityResponse {
+    public func checkAccess(languageCode: String) async throws -> TigerLagoonWebAvailabilityResponse {
         let request: URLRequest
         switch config.requestStyle {
         case .appIDOnly:
@@ -69,10 +69,10 @@ public struct TigerWebLaunchClient: Sendable {
 
         let response = try await send(request: request)
         guard response.enabled, let url = response.url else { return response }
-        return TigerWebAvailabilityResponse(enabled: true, url: Self.resolvedURL(base: url, languageCode: languageCode))
+        return TigerLagoonWebAvailabilityResponse(enabled: true, url: Self.resolvedURL(base: url, languageCode: languageCode))
     }
 
-    private func send(request: URLRequest) async throws -> TigerWebAvailabilityResponse {
+    private func send(request: URLRequest) async throws -> TigerLagoonWebAvailabilityResponse {
         let (data, response) = try await sendData(for: request)
         guard let httpResponse = response as? HTTPURLResponse,
               200..<300 ~= httpResponse.statusCode else {
@@ -81,7 +81,7 @@ public struct TigerWebLaunchClient: Sendable {
 
         persistCookies(from: httpResponse, for: request.url)
 
-        return try JSONDecoder().decode(TigerWebAvailabilityResponse.self, from: data)
+        return try JSONDecoder().decode(TigerLagoonWebAvailabilityResponse.self, from: data)
     }
 
     private func persistCookies(from response: HTTPURLResponse, for url: URL?) {
@@ -108,11 +108,11 @@ public struct TigerWebLaunchClient: Sendable {
     }
 
     public static func defaultPayload(
-        config: TigerWebLaunchConfig,
+        config: TigerLagoonWebLaunchConfig,
         languageCode: String = Locale.current.identifier
-    ) -> TigerWebLaunchPayload {
+    ) -> TigerLagoonWebLaunchPayload {
         let bundle = Bundle.main
-        return TigerWebLaunchPayload(
+        return TigerLagoonWebLaunchPayload(
             event: "app_open",
             bundleID: config.bundleID,
             appVersion: bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown",

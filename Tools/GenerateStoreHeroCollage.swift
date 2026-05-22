@@ -3,7 +3,7 @@ import Foundation
 
 let canvasSize = CGSize(width: 1920, height: 1080)
 let outputURL = URL(fileURLWithPath: "Marketing/AppStoreScreenshots/00-hero-collage.png")
-let logo = NSImage(contentsOfFile: "TigerTide/Assets.xcassets/TigerLogo.imageset/tiger-logo.png")
+let logo = NSImage(contentsOfFile: "TigerLagoon/Assets.xcassets/LagoonLogo.imageset/lagoon-logo.png")
 let gameplay = NSImage(contentsOfFile: "Marketing/AppStoreScreenshots/02-gameplay.png")
 let home = NSImage(contentsOfFile: "Marketing/AppStoreScreenshots/01-home.png")
 let win = NSImage(contentsOfFile: "Marketing/AppStoreScreenshots/03-win.png")
@@ -109,7 +109,7 @@ func drawTigerHero() {
 
     logo.draw(in: rect(526, 198, 720, 720), from: .zero, operation: .sourceOver, fraction: 1)
 
-    drawText("TIGERS TIDE", in: rect(558, 98, 670, 82), size: 78, weight: .black, color: .white, align: .center)
+    drawText("TIGER LAGOON", in: rect(522, 98, 744, 82), size: 72, weight: .black, color: .white, align: .center)
     drawText("Festival puzzle levels, boosters and star wins", in: rect(570, 48, 650, 42), size: 30, weight: .heavy, color: color(0xfff0b2), align: .center)
 }
 

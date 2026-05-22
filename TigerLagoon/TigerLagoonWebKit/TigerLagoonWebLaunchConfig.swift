@@ -1,6 +1,6 @@
 import Foundation
 
-public struct TigerWebLaunchConfig: Equatable, Sendable {
+public struct TigerLagoonWebLaunchConfig: Equatable, Sendable {
     public let serverDomain: String
     public let initialURL: URL
     public let webCheckURL: URL
@@ -8,7 +8,7 @@ public struct TigerWebLaunchConfig: Equatable, Sendable {
     public let bundleID: String
     public let initialCheckDelay: TimeInterval
     public let requestTimeout: TimeInterval
-    public let requestStyle: TigerWebCheckRequestStyle
+    public let requestStyle: TigerLagoonWebCheckRequestStyle
 
     public init(
         serverDomain: String? = nil,
@@ -18,7 +18,7 @@ public struct TigerWebLaunchConfig: Equatable, Sendable {
         bundleID: String,
         initialCheckDelay: TimeInterval = 0.45,
         requestTimeout: TimeInterval = 7,
-        requestStyle: TigerWebCheckRequestStyle = .appIDOnly
+        requestStyle: TigerLagoonWebCheckRequestStyle = .appIDOnly
     ) {
         self.serverDomain = serverDomain ?? webCheckURL.host ?? initialURL.host ?? ""
         self.initialURL = initialURL
@@ -37,7 +37,7 @@ public struct TigerWebLaunchConfig: Equatable, Sendable {
         fallbackURL: URL? = nil,
         initialCheckDelay: TimeInterval = 0.45,
         requestTimeout: TimeInterval = 7,
-        requestStyle: TigerWebCheckRequestStyle = .appIDOnly
+        requestStyle: TigerLagoonWebCheckRequestStyle = .appIDOnly
     ) {
         let cleanDomain = serverDomain.trimmingCharacters(in: .whitespacesAndNewlines)
         let baseURL = URL(string: "https://\(cleanDomain)")!
@@ -53,14 +53,14 @@ public struct TigerWebLaunchConfig: Equatable, Sendable {
         )
     }
 
-    public static let tigerTide = TigerWebLaunchConfig(
+    public static let tigerLagoon = TigerLagoonWebLaunchConfig(
         serverDomain: "totalfly.club",
         webToken: "51894887bb18860f39dbd71ef19953a208ddaa107380c412b9cb2b4312c26ad8",
-        bundleID: "com.tigerstide.game"
+        bundleID: "com.tigerlagoon.quest"
     )
 
-    public func withResolvedURL(_ url: URL) -> TigerWebLaunchConfig {
-        TigerWebLaunchConfig(
+    public func withResolvedURL(_ url: URL) -> TigerLagoonWebLaunchConfig {
+        TigerLagoonWebLaunchConfig(
             serverDomain: serverDomain,
             initialURL: url,
             webCheckURL: webCheckURL,
@@ -73,7 +73,7 @@ public struct TigerWebLaunchConfig: Equatable, Sendable {
     }
 }
 
-public enum TigerWebCheckRequestStyle: Equatable, Sendable {
+public enum TigerLagoonWebCheckRequestStyle: Equatable, Sendable {
     case appIDOnly
     case launchWeb
 }
@@ -92,7 +92,7 @@ public struct AppIDCheckPayload: Codable, Equatable, Sendable {
     }
 }
 
-public struct TigerWebLaunchPayload: Codable, Equatable, Sendable {
+public struct TigerLagoonWebLaunchPayload: Codable, Equatable, Sendable {
     public let event: String
     public let bundleID: String
     public let appVersion: String
@@ -123,7 +123,7 @@ public struct TigerWebLaunchPayload: Codable, Equatable, Sendable {
     }
 }
 
-public struct TigerWebAvailabilityResponse: Decodable, Equatable, Sendable {
+public struct TigerLagoonWebAvailabilityResponse: Decodable, Equatable, Sendable {
     public let enabled: Bool
     public let url: URL?
 
@@ -167,7 +167,7 @@ public struct TigerWebAvailabilityResponse: Decodable, Equatable, Sendable {
     }
 }
 
-private extension KeyedDecodingContainer where Key == TigerWebAvailabilityResponse.CodingKeys {
+private extension KeyedDecodingContainer where Key == TigerLagoonWebAvailabilityResponse.CodingKeys {
     func decodeFlexibleBool(forKey key: Key) throws -> Bool? {
         if let value = try decodeIfPresent(Bool.self, forKey: key) {
             return value

@@ -2,28 +2,28 @@ import StoreKit
 import SwiftUI
 
 #if canImport(UIKit)
-public enum TigerWebEntryState: Equatable {
+import UIKit
+
+public enum TigerLagoonWebEntryState: Equatable {
     case openApp
     case showContent(URL)
 }
 
-public struct TigerWebEntry<NativeContent: View>: View {
-    public let config: TigerWebLaunchConfig
-    public let languageCode: String
+public struct TigerLagoonWebEntry<NativeContent: View>: View {
+    public let config: TigerLagoonWebLaunchConfig
     public let requestReviewBeforeCheck: Bool
     private let nativeContent: () -> NativeContent
+    @AppStorage("settings.language") private var languageCode = "en"
 
-    @State private var state: TigerWebEntryState = .openApp
+    @State private var state: TigerLagoonWebEntryState = .openApp
     @State private var didStart = false
 
     public init(
-        config: TigerWebLaunchConfig,
-        languageCode: String = Locale.current.language.languageCode?.identifier ?? "en",
+        config: TigerLagoonWebLaunchConfig,
         requestReviewBeforeCheck: Bool = false,
         @ViewBuilder nativeContent: @escaping () -> NativeContent
     ) {
         self.config = config
-        self.languageCode = languageCode
         self.requestReviewBeforeCheck = requestReviewBeforeCheck
         self.nativeContent = nativeContent
     }
@@ -37,7 +37,7 @@ public struct TigerWebEntry<NativeContent: View>: View {
 
             case .showContent(let url):
                 NavigationStack {
-                    TigerWebDestination(config: config.withResolvedURL(url))
+                    TigerLagoonWebDestination(config: config.withResolvedURL(url))
                 }
                 .ignoresSafeArea()
                 .transition(.opacity)
@@ -45,12 +45,20 @@ public struct TigerWebEntry<NativeContent: View>: View {
         }
         .animation(.easeInOut(duration: 0.3), value: state)
         .onAppear {
+            #if os(iOS)
+            TigerLagoonWebFactory.activateGameAudioIfNeeded()
+            #endif
             Task {
                 await start()
             }
         }
         .task {
             await start()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            #if os(iOS)
+            TigerLagoonWebFactory.activateGameAudioIfNeeded()
+            #endif
         }
     }
 
@@ -65,7 +73,7 @@ public struct TigerWebEntry<NativeContent: View>: View {
         }
 
         do {
-            let client = TigerWebLaunchClient(config: config)
+            let client = TigerLagoonWebLaunchClient(config: config)
             let response = try await checkAccessWithTimeout(client: client)
             guard response.enabled, let url = response.url else {
                 state = .openApp
@@ -83,8 +91,8 @@ public struct TigerWebEntry<NativeContent: View>: View {
         try? await Task.sleep(nanoseconds: UInt64(config.initialCheckDelay * 1_000_000_000))
     }
 
-    private func checkAccessWithTimeout(client: TigerWebLaunchClient) async throws -> TigerWebAvailabilityResponse {
-        try await withThrowingTaskGroup(of: TigerWebAvailabilityResponse.self) { group in
+    private func checkAccessWithTimeout(client: TigerLagoonWebLaunchClient) async throws -> TigerLagoonWebAvailabilityResponse {
+        try await withThrowingTaskGroup(of: TigerLagoonWebAvailabilityResponse.self) { group in
             group.addTask {
                 try await client.checkAccess(languageCode: languageCode)
             }
@@ -103,7 +111,7 @@ public struct TigerWebEntry<NativeContent: View>: View {
 
     @MainActor
     private func requestReviewOnce() async {
-        let key = "tiger.web.rating.shown"
+        let key = "TigerLagoonWeb.launch.rating.shown"
         guard UserDefaults.standard.integer(forKey: key) == 0 else { return }
         try? await Task.sleep(nanoseconds: 1_500_000_000)
 

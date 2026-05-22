@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TigerTideGameView: View {
+struct TigerLagoonGameView: View {
     let level: TigerLevel
     let bonusMoves: Int
     let bonusFocus: Int
@@ -10,7 +10,7 @@ struct TigerTideGameView: View {
     var onLevelComplete: (TigerLevelResult) -> Void = { _ in }
     var onNextLevel: () -> Void = {}
 
-    @State private var game: TigerTideGame
+    @State private var game: TigerLagoonGame
     @State private var beaconMode = false
     @State private var message = "LEAP UP TO TWO TILES"
     @State private var selected: TidePoint?
@@ -19,6 +19,7 @@ struct TigerTideGameView: View {
     @State private var defeat = false
     @State private var winPulse = false
     @State private var idleSeconds = 0
+    @State private var boardPulse = 0
 
     init(
         level: TigerLevel,
@@ -38,7 +39,7 @@ struct TigerTideGameView: View {
         self.onExit = onExit
         self.onLevelComplete = onLevelComplete
         self.onNextLevel = onNextLevel
-        self._game = State(initialValue: TigerTideGame(level: level, bonusMoves: bonusMoves, bonusFocus: bonusFocus))
+        self._game = State(initialValue: TigerLagoonGame(level: level, bonusMoves: bonusMoves, bonusFocus: bonusFocus))
     }
 
     var body: some View {
@@ -78,14 +79,14 @@ struct TigerTideGameView: View {
     private var topBar: some View {
         HStack(spacing: 10) {
             Button("HOME") { onExit() }
-                .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
+                .buttonStyle(TigerButtonStyle(tint: TidePalette.orchid))
                 .frame(width: 92)
 
             Spacer()
-            Text("TIGERS TIDE")
+            Text("TIGER LAGOON")
                 .font(.system(size: 24, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
-                .shadow(color: Color.tigerHex(0xFFE15A), radius: 8)
+                .shadow(color: TidePalette.mango, radius: 8)
             Spacer()
 
             Button {
@@ -93,7 +94,7 @@ struct TigerTideGameView: View {
             } label: {
                 Image(systemName: "arrow.clockwise")
             }
-            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x12A86B)))
+            .buttonStyle(TigerButtonStyle(tint: TidePalette.mint))
             .frame(width: 56)
         }
     }
@@ -107,7 +108,7 @@ struct TigerTideGameView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("LEVEL \(level.id)")
                         .font(.system(size: 11, weight: .black, design: .rounded))
-                        .foregroundStyle(Color.tigerHex(0xFFE15A))
+                        .foregroundStyle(TidePalette.mango)
                     Text(level.title.uppercased())
                         .font(.system(size: 18, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
@@ -116,15 +117,15 @@ struct TigerTideGameView: View {
 
                 Spacer()
 
-                TideChip(title: "Moves", value: "\(game.moves)", tint: .tigerHex(0x12A86B))
+                TideChip(title: "Moves", value: "\(game.moves)", tint: TidePalette.mint)
                     .frame(width: 76)
-                TideChip(title: "Trails", value: "\(game.trailsOpened)/\(level.targetTrails)", tint: .tigerHex(0xFF6FB1))
+                TideChip(title: game.combo > 1 ? "Combo" : "Trails", value: game.combo > 1 ? "x\(game.combo)" : "\(game.trailsOpened)/\(level.targetTrails)", tint: game.combo > 1 ? TidePalette.mango : TidePalette.orchid)
                     .frame(width: 76)
             }
 
             HStack(spacing: 10) {
-                ProgressStrip(title: "Score", value: "\(game.score)/\(level.targetScore)", progress: game.scoreProgress, tint: .tigerHex(0xFF5A36))
-                ProgressStrip(title: "Trail", value: "\(game.trailsOpened)/\(level.targetTrails)", progress: game.trailProgress, tint: .tigerHex(0x12A86B))
+                ProgressStrip(title: "Score", value: "\(game.score)/\(level.targetScore)", progress: game.scoreProgress, tint: TidePalette.coral)
+                ProgressStrip(title: "Trail", value: "\(game.trailsOpened)/\(level.targetTrails)", progress: game.trailProgress, tint: TidePalette.mint)
             }
 
             HStack(spacing: 6) {
@@ -139,8 +140,8 @@ struct TigerTideGameView: View {
             }
         }
         .padding(10)
-        .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.32), lineWidth: 1))
+        .background(TidePalette.ink.opacity(0.28), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(TidePalette.mango.opacity(0.32), lineWidth: 1))
     }
 
     private var board: some View {
@@ -152,9 +153,10 @@ struct TigerTideGameView: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(.black.opacity(0.2))
-                    .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.45), lineWidth: 2))
+                    .fill(TidePalette.ink.opacity(0.28))
+                    .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(TidePalette.mango.opacity(0.48), lineWidth: 2))
                     .frame(width: side, height: side)
+                    .shadow(color: TidePalette.sky.opacity(0.15), radius: 18, y: 6)
 
                 ForEach(game.positionedTiles) { entry in
                     Button {
@@ -167,6 +169,8 @@ struct TigerTideGameView: View {
                             highlighted: highlights.contains(entry.point)
                         )
                         .frame(width: cell, height: cell)
+                        .scaleEffect(highlights.contains(entry.point) ? 1.08 : 1)
+                        .animation(.spring(response: 0.26, dampingFraction: 0.68), value: boardPulse)
                     }
                     .buttonStyle(.plain)
                     .disabled(victory != nil || defeat)
@@ -179,6 +183,7 @@ struct TigerTideGameView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .layoutPriority(2)
+        .animation(.spring(response: 0.3, dampingFraction: 0.75), value: highlights)
     }
 
     private var controls: some View {
@@ -186,13 +191,13 @@ struct TigerTideGameView: View {
             Button("ROAR \(game.roarCharges + roarInventory)") {
                 useRoar()
             }
-            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFF5A36)))
+            .buttonStyle(TigerButtonStyle(tint: TidePalette.coral))
 
             Button(beaconMode ? "PLACE" : "BEACON \(game.beaconCharges + beaconInventory)") {
                 beaconMode.toggle()
                 message = beaconMode ? "TAP A TILE TO ANCHOR IT" : "LEAP UP TO TWO TILES"
             }
-            .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x60D6F5)))
+            .buttonStyle(TigerButtonStyle(tint: TidePalette.sky))
         }
         .disabled(victory != nil || defeat)
     }
@@ -270,6 +275,7 @@ struct TigerTideGameView: View {
     private func apply(_ outcome: TigerOutcome) {
         message = outcome.message
         highlights = outcome.highlights
+        boardPulse += 1
 
         if let completed = outcome.completedLevel {
             complete(completed)
@@ -319,7 +325,7 @@ struct TigerTideGameView: View {
             .filter { $0.tile.kind == need && $0.tile.flooded == false }
             .map(\.point)
         highlights = Set(targets)
-        message = "\(trail.name.uppercased()): NEXT \(need.rawValue.uppercased())"
+        message = "\(trail.name.uppercased()): NEXT \(need.rawValue.uppercased()) • \(targets.count) READY"
         GameFeedback.shared.light()
     }
 
@@ -340,6 +346,7 @@ struct TigerTideGameView: View {
         victory = nil
         defeat = false
         winPulse = false
+        boardPulse = 0
         idleSeconds = 0
     }
 
@@ -380,7 +387,7 @@ struct DefeatOverlay: View {
                         .shadow(color: .black.opacity(0.45), radius: 6)
                     Text("Level \(level.id) needs more trail work")
                         .font(.system(size: 17, weight: .black, design: .rounded))
-                        .foregroundStyle(Color.tigerHex(0xFFE15A))
+                        .foregroundStyle(TidePalette.mango)
                 }
 
                 VStack(spacing: 8) {
@@ -394,17 +401,17 @@ struct DefeatOverlay: View {
                 }
 
                 Button("RETRY LEVEL") { onRetry() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xFF5A36)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.coral))
 
                 Button("HOME") { onHome() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.orchid))
             }
             .padding(22)
             .background(
-                LinearGradient(colors: [.tigerHex(0x7A1234), .tigerHex(0x1F0920)], startPoint: .top, endPoint: .bottom),
+                LinearGradient(colors: [TidePalette.night, TidePalette.ink], startPoint: .top, endPoint: .bottom),
                 in: RoundedRectangle(cornerRadius: 24, style: .continuous)
             )
-            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.tigerHex(0xFFE15A).opacity(0.7), lineWidth: 2))
+            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(TidePalette.mango.opacity(0.7), lineWidth: 2))
             .padding(24)
         }
     }
@@ -419,6 +426,7 @@ struct VictoryOverlay: View {
     var body: some View {
         ZStack {
             Color.black.opacity(0.44).ignoresSafeArea()
+            WinConfetti(active: pulse)
 
             VStack(spacing: 16) {
                 TigerAvatar(focused: true)
@@ -428,8 +436,8 @@ struct VictoryOverlay: View {
                 VStack(spacing: 4) {
                     Text(starStatus)
                         .font(.system(size: 42, weight: .black, design: .rounded))
-                        .foregroundStyle(Color.tigerHex(0xFFE15A))
-                        .shadow(color: Color.tigerHex(0xFF5A36), radius: 8)
+                        .foregroundStyle(TidePalette.mango)
+                        .shadow(color: TidePalette.coral, radius: 8)
                     Text("Level \(result.level.id) Complete")
                         .font(.system(size: 19, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
@@ -444,24 +452,24 @@ struct VictoryOverlay: View {
                         .multilineTextAlignment(.center)
                     Text("+\(result.coins) COINS")
                         .font(.system(size: 28, weight: .black, design: .rounded))
-                        .foregroundStyle(Color.tigerHex(0xFFE15A))
-                    Text("Score \(result.score) • Trails \(result.trailsOpened)")
+                        .foregroundStyle(TidePalette.mango)
+                    Text("Score \(result.score) • Trails \(result.trailsOpened) • Combo x\(max(1, result.maxCombo))")
                         .font(.system(size: 13, weight: .black, design: .rounded))
                         .foregroundStyle(.white.opacity(0.72))
                 }
 
                 Button("NEXT LEVEL") { onNext() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0x12A86B)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.mint))
 
                 Button("HOME") { onHome() }
-                    .buttonStyle(TigerButtonStyle(tint: .tigerHex(0xC7193B)))
+                    .buttonStyle(TigerButtonStyle(tint: TidePalette.orchid))
             }
             .padding(22)
             .background(
-                LinearGradient(colors: [.tigerHex(0xF33248), .tigerHex(0x64124A)], startPoint: .top, endPoint: .bottom),
+                LinearGradient(colors: [TidePalette.coral, TidePalette.night], startPoint: .top, endPoint: .bottom),
                 in: RoundedRectangle(cornerRadius: 24, style: .continuous)
             )
-            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.tigerHex(0xFFE15A), lineWidth: 2))
+            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(TidePalette.mango, lineWidth: 2))
             .padding(24)
         }
     }
@@ -471,6 +479,28 @@ struct VictoryOverlay: View {
         case 3: return "3 STARS"
         case 2: return "2 STARS"
         default: return "1 STAR"
+        }
+    }
+}
+
+struct WinConfetti: View {
+    let active: Bool
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            Canvas { context, size in
+                guard active else { return }
+                let time = timeline.date.timeIntervalSinceReferenceDate
+                let colors: [Color] = [TidePalette.mango, TidePalette.mint, TidePalette.sky, TidePalette.coral, TidePalette.orchid]
+                for index in 0..<46 {
+                    let x = CGFloat((index * 47) % max(1, Int(size.width)))
+                    let fall = CGFloat((time * Double(80 + index % 7 * 12)).truncatingRemainder(dividingBy: Double(size.height + 80)))
+                    let y = fall - 40
+                    let rect = CGRect(x: x, y: y, width: 7 + CGFloat(index % 3), height: 11 + CGFloat(index % 4))
+                    context.fill(Path(roundedRect: rect, cornerRadius: 2), with: .color(colors[index % colors.count].opacity(0.9)))
+                }
+            }
+            .ignoresSafeArea()
         }
     }
 }

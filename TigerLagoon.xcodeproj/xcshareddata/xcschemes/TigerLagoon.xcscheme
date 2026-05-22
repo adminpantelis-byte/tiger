@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "020000000000000000000040"
-               BuildableName = "TigerTide.app"
-               BlueprintName = "TigerTide"
-               ReferencedContainer = "container:TigerTide.xcodeproj">
+               BuildableName = "TigerLagoon.app"
+               BlueprintName = "TigerLagoon"
+               ReferencedContainer = "container:TigerLagoon.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "020000000000000000000040"
-            BuildableName = "TigerTide.app"
-            BlueprintName = "TigerTide"
-            ReferencedContainer = "container:TigerTide.xcodeproj">
+            BuildableName = "TigerLagoon.app"
+            BlueprintName = "TigerLagoon"
+            ReferencedContainer = "container:TigerLagoon.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "020000000000000000000040"
-            BuildableName = "TigerTide.app"
-            BlueprintName = "TigerTide"
-            ReferencedContainer = "container:TigerTide.xcodeproj">
+            BuildableName = "TigerLagoon.app"
+            BlueprintName = "TigerLagoon"
+            ReferencedContainer = "container:TigerLagoon.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
