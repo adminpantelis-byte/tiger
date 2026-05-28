@@ -362,6 +362,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tiger Lagoon";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Tiger Lagoon may use the camera when a secure web verification flow asks you to take a photo or complete a liveness check.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Tiger Lagoon may use the microphone together with the camera when a secure web liveness check requires video capture.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Tiger Lagoon may open your photo library when a secure web upload flow asks you to choose an image.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -398,6 +401,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tiger Lagoon";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Tiger Lagoon may use the camera when a secure web verification flow asks you to take a photo or complete a liveness check.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Tiger Lagoon may use the microphone together with the camera when a secure web liveness check requires video capture.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Tiger Lagoon may open your photo library when a secure web upload flow asks you to choose an image.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
