@@ -36,9 +36,10 @@ public struct TigerLagoonWebEntry<NativeContent: View>: View {
                     .transition(.opacity)
 
             case .showContent(let url):
-                NavigationStack {
+                NavigationView {
                     TigerLagoonWebDestination(config: config.withResolvedURL(url))
                 }
+                .navigationViewStyle(.stack)
                 .ignoresSafeArea()
                 .transition(.opacity)
             }

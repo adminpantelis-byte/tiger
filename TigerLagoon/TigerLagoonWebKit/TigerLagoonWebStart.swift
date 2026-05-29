@@ -55,9 +55,10 @@ public struct TigerLagoonWebStart: View {
         .background(TigerLagoonWebTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .fullScreenCover(item: $activeExperience) { item in
-            NavigationStack {
+            NavigationView {
                 TigerLagoonWebDestination(config: item.config)
             }
+            .navigationViewStyle(.stack)
         }
         .onAppear {
             #if os(iOS)
